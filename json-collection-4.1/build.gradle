@@ -1,0 +1,2 @@
+configurations.create("default")
+artifacts.add("default", file('json-collection-4.1-SNAPSHOT.jar'))
