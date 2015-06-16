@@ -1,2 +1,2 @@
-include ':app', ':json-collection-4.1'
+include ':app'
 include ':'

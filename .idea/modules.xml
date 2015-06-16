@@ -4,7 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/htwplus.iml" filepath="$PROJECT_DIR$/htwplus.iml" />
-      <module fileurl="file://$PROJECT_DIR$/json-collection-4.1/json-collection-4.1.iml" filepath="$PROJECT_DIR$/json-collection-4.1/json-collection-4.1.iml" />
     </modules>
   </component>
 </project>
