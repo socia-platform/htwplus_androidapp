@@ -1,93 +1,84 @@
 package htw_berlin.de.htwplus;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
-import net.hamnaberg.json.Collection;
-import net.hamnaberg.json.parser.CollectionParser;
-import net.hamnaberg.funclite.Function;
-import net.hamnaberg.funclite.FunctionalList;
-import net.hamnaberg.funclite.Optional;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
+import org.json.JSONObject;
+
+import java.util.Map;
 
 
-public class MainActivity extends Activity {
+/*
+0.0.2.1	    Router/gateway address
+10.0.2.2	Special alias to your host loopback interface (i.e., 127.0.0.1 on your development machine)
+10.0.2.3	First DNS server
+10.0.2.15	The emulated device's own network/ethernet interface
+127.0.0.1	The emulated device's own loopback interface
+ */
 
-    boolean col = true;
-    private InputStream dum;
-    private String result = "";
-    private DefaultHttpClient client;
-    Collection collection;
-
+public class MainActivity extends Activity implements Response.Listener, Response.ErrorListener {
+    public static final String REQUEST_TAG = "MainVolleyActivity";
+    private String url = "http://10.0.2.2:9000/api/persons";
+    private TextView mTextView;
+    private Button mButton;
+    private RequestQueue mQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        client = new DefaultHttpClient();
-        try {
-            collection = client.execute(new HttpGet(URI.create("http://localhost:9000/api/persons")), new CollectionResponseHandler());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println(collection.toString());
+        mTextView = (TextView) findViewById(R.id.mTextView);
+        mButton = (Button) findViewById(R.id.mButton);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
+    protected void onStart() {
+        super.onStart();
+        mQueue = VolleyNetworkController.getInstance(this.getApplicationContext()).getRequestQueue();
+        JSONObject json = new JSONObject();
+        System.out.println(json.toString());
+        final CustomJsonObjectRequest jsonRequest = new CustomJsonObjectRequest(Request.Method.GET, url, json, this, this);
+        jsonRequest.setTag(REQUEST_TAG);
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    private static class CollectionResponseHandler implements ResponseHandler<Collection> {
-        @Override
-        public Collection handleResponse(HttpResponse response) throws IOException {
-            if (response.getStatusLine().getStatusCode() == 200) {
-                if (isCollectionJSON(response)) {
-                    InputStream content = null;
-                    try {
-                        content = response.getEntity().getContent();
-                        return new CollectionParser().parse(content);
-                    } finally {
-                        if (content != null) {
-                            content.close();
-                        }
-                    }
-                }
+        mButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mQueue.add(jsonRequest);
             }
-            throw new RuntimeException("No usable status here");
-        }
+        });
+    }
 
-        private boolean isCollectionJSON(HttpResponse response) {
-            return response.getEntity() != null && "application/vnd.collection+json".equals(response.getEntity().getContentType().getValue());
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mQueue != null) {
+            mQueue.cancelAll(REQUEST_TAG);
+        }
+    }
+
+    @Override
+    public void onErrorResponse(VolleyError error) {
+        mTextView.setText(error.getMessage());
+    }
+
+    @Override
+    public void onResponse(Object response) {
+        mTextView.setText("Response is: " + response);
+        try {
+            response = (JSONObject) response;
+            //mTextView.setText(mTextView.getText() + "\n\n" + ((JSONObject) response).getString("Name"));
+            Map<String, Object> map = CustomJsonObjectRequest.toMap((JSONObject) response);
+            mTextView.setText(mTextView.getText() + "\n\n" + map.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
-

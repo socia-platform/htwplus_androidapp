@@ -13,7 +13,8 @@ buildscript {
 }
 
 allprojects {
-    repositories {
+        repositories {
         jcenter()
+        task hello << { task -> println "I'm $task.project.name" }
     }
 }
