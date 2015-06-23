@@ -29,7 +29,7 @@ public class CustomJsonObjectRequest extends JsonObjectRequest {
 
     @Override
     public String getBodyContentType() {
-        return "application/collection+json; charset=utf-8";
+        return "application/vnd.collection+json; charset=utf-8";
     }
 
     @Override

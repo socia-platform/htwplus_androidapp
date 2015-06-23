@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -24,12 +25,14 @@ import java.util.Map;
 127.0.0.1	The emulated device's own loopback interface
  */
 
-public class MainActivity extends Activity implements Response.Listener, Response.ErrorListener {
+public class MainActivity extends Activity implements Response.Listener, Response.ErrorListener, View.OnClickListener {
     public static final String REQUEST_TAG = "MainVolleyActivity";
-    private String url = "http://10.0.2.2:9000/api/persons";
+    private String url = "http://192.168.0.212:9000/api/persons";
     private TextView mTextView;
     private Button mButton;
-    private RequestQueue mQueue;
+    private Button mButtonPost;
+    //private RequestQueue mQueue;
+    private EditText mEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,16 +40,21 @@ public class MainActivity extends Activity implements Response.Listener, Respons
         setContentView(R.layout.activity_main);
         mTextView = (TextView) findViewById(R.id.mTextView);
         mButton = (Button) findViewById(R.id.mButton);
+        mButtonPost = (Button) findViewById(R.id.mButtonPost);
+        mButton.setOnClickListener(this);
+        mButtonPost.setOnClickListener(this);
+        mEditText = (EditText) findViewById(R.id.mEditText);
+        //mQueue = VolleyNetworkController.getInstance(this.getApplicationContext()).getRequestQueue();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        mQueue = VolleyNetworkController.getInstance(this.getApplicationContext()).getRequestQueue();
+        /*
         JSONObject json = new JSONObject();
-        System.out.println(json.toString());
         final CustomJsonObjectRequest jsonRequest = new CustomJsonObjectRequest(Request.Method.GET, url, json, this, this);
         jsonRequest.setTag(REQUEST_TAG);
+        System.out.println(json.toString());
 
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,14 +62,23 @@ public class MainActivity extends Activity implements Response.Listener, Respons
                 mQueue.add(jsonRequest);
             }
         });
+        */
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v == mButton) {
+            VolleyNetworkController.getInstance().getAllPersons(REQUEST_TAG, this, this);
+        } else if(v == mButtonPost) {
+            //VolleyNetworkController.getInstance().addPerson(mEditText.getText().toString(), REQUEST_TAG, this, this);
+            VolleyNetworkController.getInstance().addPerson("Xavier", REQUEST_TAG, this, this);
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (mQueue != null) {
-            mQueue.cancelAll(REQUEST_TAG);
-        }
+        VolleyNetworkController.getInstance().cancelRequest(REQUEST_TAG);
     }
 
     @Override
@@ -73,7 +90,7 @@ public class MainActivity extends Activity implements Response.Listener, Respons
     public void onResponse(Object response) {
         mTextView.setText("Response is: " + response);
         try {
-            response = (JSONObject) response;
+            // response = (JSONObject) response;
             //mTextView.setText(mTextView.getText() + "\n\n" + ((JSONObject) response).getString("Name"));
             Map<String, Object> map = CustomJsonObjectRequest.toMap((JSONObject) response);
             mTextView.setText(mTextView.getText() + "\n\n" + map.toString());
