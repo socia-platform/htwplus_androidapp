@@ -57,8 +57,8 @@ public class VolleyNetworkController {
         mRequestQueue.cancelAll(tag);
     }
 
-    public void getAllPersons(Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
-        String url = ApplicationController.getApiUrl().toString() + "persons";
+    public void getUser(long userId, Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
+        String url = ApplicationController.getApiUrl().toString() + "users/" + userId;
         final CustomJsonObjectRequest jsonRequest = new CustomJsonObjectRequest(Request.Method.GET, url, new JSONObject(), responseListener, errorListener);
         jsonRequest.setTag(tag);
         mRequestQueue.add(jsonRequest);

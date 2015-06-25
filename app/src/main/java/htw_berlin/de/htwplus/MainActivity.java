@@ -68,7 +68,7 @@ public class MainActivity extends Activity implements Response.Listener, Respons
     @Override
     public void onClick(View v) {
         if(v == mButton) {
-            VolleyNetworkController.getInstance().getAllPersons(REQUEST_TAG, this, this);
+            VolleyNetworkController.getInstance().getUser(1, REQUEST_TAG, this, this);
         } else if(v == mButtonPost) {
             //VolleyNetworkController.getInstance().addPerson(mEditText.getText().toString(), REQUEST_TAG, this, this);
             VolleyNetworkController.getInstance().addPerson("Xavier", REQUEST_TAG, this, this);
