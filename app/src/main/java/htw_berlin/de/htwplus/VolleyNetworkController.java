@@ -64,73 +64,12 @@ public class VolleyNetworkController {
         mRequestQueue.add(jsonRequest);
     }
 
-    public void addPerson(String name, Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
-        JSONObject personJson = TESTbuildJsonPost(name);
-        String url = ApplicationController.getApiUrl().toString() + "person";
-        final CustomJsonObjectRequest jsonRequest = new CustomJsonObjectRequest(Request.Method.POST, url, personJson, responseListener, errorListener);
-        jsonRequest.setTag(tag);
-        System.out.println(jsonRequest.toString());
-        System.out.println(jsonRequest.getBodyContentType());
-        mRequestQueue.add(jsonRequest);
+    public void getPost(long postId, Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
+        throw new UnsupportedOperationException("getPost() still need to be implemented.");
     }
 
-    private JSONObject TESTbuildJsonPost(String name)
-    {
-        JSONObject personJson = new JSONObject();
-
-        try {
-
-            JSONObject collectionSet = new JSONObject();
-            collectionSet.put("version", 1.0);
-            collectionSet.put("href", ApplicationController.getApiUrl().toString() + "person");
-
-
-            JSONObject item = new JSONObject();
-            item.put("href", ApplicationController.getApiUrl().toString() + "person");
-            JSONObject dataSet = new JSONObject();
-            dataSet.put("name", name);
-            JSONArray dataSetArray = new JSONArray();
-            dataSetArray.put(dataSet);
-            item.put("data", dataSetArray);
-            JSONArray itemArray = new JSONArray();
-            itemArray.put(item);
-            collectionSet.put("items", itemArray);
-
-            collectionSet.put("template", new JSONObject());
-
-            JSONObject errorSet = new JSONObject();
-            errorSet.put("title", "");
-            errorSet.put("code", "");
-            errorSet.put("message", "");
-            collectionSet.put("error", errorSet);
-
-            personJson.put("collection", collectionSet);
-
-        } catch (Exception ex)
-        {
-            throw new IllegalArgumentException("JSONObject falsch zusammengesetzt");
-        }
-
-        /*
-             { \"collection\": " +
-                "{
-                    \"version\": \"1.0\",
-                    \"href\": \"localhost:9000/api/stream/7/addPost\",
-                    \"items\":
-                    [{
-                        \"href\": \"localhost:9000/api/stream/7/addPost\",
-                        \"data\": [ { \"name\": \"Paul\" } ]
-                    }],
-                    \"template\": {},
-                    \"error\":
-                    {
-                        \"title\": \"\",
-                        \"code\": \"\",
-                        \"message\": \"\"
-                    }
-                 }
-              }
-         */
-        return personJson;
+    public void addPost() {
+        throw new UnsupportedOperationException("addPost() still need to be implemented.");
     }
+
 }

@@ -12,9 +12,16 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
+import net.hamnaberg.json.Collection;
+
 import org.json.JSONObject;
 
+import java.util.List;
 import java.util.Map;
+
+import htw_berlin.de.htwplus.datamodel.ApiError;
+import htw_berlin.de.htwplus.datamodel.User;
+import htw_berlin.de.htwplus.util.JsonCollectionHelper;
 
 
 /*
@@ -70,8 +77,7 @@ public class MainActivity extends Activity implements Response.Listener, Respons
         if(v == mButton) {
             VolleyNetworkController.getInstance().getUser(1, REQUEST_TAG, this, this);
         } else if(v == mButtonPost) {
-            //VolleyNetworkController.getInstance().addPerson(mEditText.getText().toString(), REQUEST_TAG, this, this);
-            VolleyNetworkController.getInstance().addPerson("Xavier", REQUEST_TAG, this, this);
+            //VolleyNetworkController.getInstance().addPost();
         }
     }
 
@@ -94,6 +100,21 @@ public class MainActivity extends Activity implements Response.Listener, Respons
             //mTextView.setText(mTextView.getText() + "\n\n" + ((JSONObject) response).getString("Name"));
             Map<String, Object> map = CustomJsonObjectRequest.toMap((JSONObject) response);
             mTextView.setText(mTextView.getText() + "\n\n" + map.toString());
+
+            Collection collection = JsonCollectionHelper.parse(response.toString());
+            if (!JsonCollectionHelper.hasError(collection)) {
+                List<User> users = JsonCollectionHelper.toUsers(collection);
+                mTextView.setText(mTextView.getText() + "\n\nUsers:\n");
+                for (User user : users)
+                    mTextView.setText(mTextView.getText() + user.getFirstName() + " " +
+                            user.getLastName() + ", " + user.getEmail() + ", " +
+                            user.getStudycourse());
+            } else {
+                ApiError apiError = JsonCollectionHelper.toError(collection);
+                mTextView.setText(mTextView.getText() + "\n\nError!\n");
+                mTextView.setText(mTextView.getText() + apiError.toString());
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
