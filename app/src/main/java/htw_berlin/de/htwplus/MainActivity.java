@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -14,6 +15,7 @@ import com.android.volley.VolleyError;
 
 import net.hamnaberg.json.Collection;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -77,7 +79,16 @@ public class MainActivity extends Activity implements Response.Listener, Respons
         if(v == mButton) {
             VolleyNetworkController.getInstance().getUser(1, REQUEST_TAG, this, this);
         } else if(v == mButtonPost) {
-            //VolleyNetworkController.getInstance().addPost();
+            try {
+                String postMessage = mEditText.getText().toString();
+                if (!postMessage.isEmpty())
+                    VolleyNetworkController.getInstance().addPost(postMessage, 1, 1, null, null, REQUEST_TAG, this, this);
+                else
+                    Toast.makeText(getApplicationContext(), "Bitte Post-Message eingeben!", Toast.LENGTH_LONG).show();
+            } catch (JSONException jex) {
+                Toast.makeText(getApplicationContext(), "JSON parse Exception!\nSiehe konsole!", Toast.LENGTH_LONG).show();
+                jex.printStackTrace();
+            }
         }
     }
 
@@ -89,7 +100,15 @@ public class MainActivity extends Activity implements Response.Listener, Respons
 
     @Override
     public void onErrorResponse(VolleyError error) {
-        mTextView.setText(error.getMessage());
+        mTextView.setText("Error\n");
+        if (error != null) {
+            mTextView.setText(mTextView.getText() + error.getMessage());
+            if (error.getMessage().contains("org.json.JSONException: End of input at character 0"))
+                mTextView.setText(mTextView.getText() + "\nVolley erwartet hier eine Antwort " +
+                        "mit JSON im Body was aber bei einem POST Request keinen Sinn macht.\n" +
+                        "Hier muss die Methode parseNetworkResponse() überschrieben werden.\n" +
+                        "Der POST-Request wurde aber trotzdem erfolgreich vom Server verarbeitet.");
+        }
     }
 
     @Override
