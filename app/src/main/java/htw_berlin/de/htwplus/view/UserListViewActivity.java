@@ -1,9 +1,12 @@
 package htw_berlin.de.htwplus.view;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -16,6 +19,7 @@ import net.hamnaberg.json.Collection;
 import java.util.ArrayList;
 import java.util.List;
 
+import htw_berlin.de.htwplus.ApplicationController;
 import htw_berlin.de.htwplus.R;
 import htw_berlin.de.htwplus.datamodel.ApiError;
 import htw_berlin.de.htwplus.datamodel.User;
@@ -31,11 +35,22 @@ public class UserListViewActivity extends Activity implements Response.Listener,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_list_view);
-        listview = (ListView) findViewById(R.id.list);
         mlist = new ArrayList<User>();
-        mlist.add(new User("Tim", "Unkrig", "tunkrig@gmail.com", "Science"));
+        ApplicationController.getVolleyController().getUsers(this, this, this, this);
+        listview = (ListView) findViewById(R.id.list);
         mAdapter = new ArrayAdapter<User>(this, android.R.layout.simple_list_item_1, mlist);
         listview.setAdapter(mAdapter);
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(view.getContext(), ShowUserActivity.class);
+                intent.putExtra("Firstname", mlist.get(position).getFirstName());
+                intent.putExtra("Lastname", mlist.get(position).getLastName());
+                intent.putExtra("Email", mlist.get(position).getEmail());
+                intent.putExtra("Class", mlist.get(position).getClass());
+                UserListViewActivity.this.startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -51,7 +66,7 @@ public class UserListViewActivity extends Activity implements Response.Listener,
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
+        Toast.makeText(this, id, Toast.LENGTH_SHORT).show();
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;

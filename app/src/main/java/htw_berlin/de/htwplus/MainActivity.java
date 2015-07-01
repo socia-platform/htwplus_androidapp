@@ -17,7 +17,6 @@ import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Map;
-
 import htw_berlin.de.htwplus.datamodel.ApiError;
 import htw_berlin.de.htwplus.datamodel.User;
 import htw_berlin.de.htwplus.util.JsonCollectionHelper;

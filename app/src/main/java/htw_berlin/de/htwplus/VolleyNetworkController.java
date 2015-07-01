@@ -25,6 +25,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import htw_berlin.de.htwplus.view.UserListViewActivity;
+
 public class VolleyNetworkController {
 
     private static VolleyNetworkController mInstance;
@@ -72,7 +74,7 @@ public class VolleyNetworkController {
         mRequestQueue.add(jsonRequest);
     }
 
-    public void getUsers(Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
+    public void getUsers(UserListViewActivity userListViewActivity, Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
         String url = ApplicationController.getApiUrl().toString() + "users";
         final CustomJsonObjectRequest jsonRequest = new CustomJsonObjectRequest(Request.Method.GET, url, new JSONObject(), responseListener, errorListener);
         jsonRequest.setTag(tag);
