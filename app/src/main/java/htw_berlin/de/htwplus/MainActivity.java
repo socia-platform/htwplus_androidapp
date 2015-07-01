@@ -80,7 +80,11 @@ public class MainActivity extends Activity implements Response.Listener, Respons
                 jex.printStackTrace();
             }
         }*/
+        /*
         Intent intent = new Intent(this, UserListViewActivity.class);
+        MainActivity.this.startActivity(intent);
+        */
+        Intent intent = new Intent(this, NavigationDrawerActivity.class);
         MainActivity.this.startActivity(intent);
     }
 
