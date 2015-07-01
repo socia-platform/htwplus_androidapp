@@ -5,4 +5,5 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="request">Request</string>
     <string name="title_activity_user_list_view">UserListViewActivity</string>
+    <string name="title_activity_show_user">ShowUserActivity</string>
 </resources>
