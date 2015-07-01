@@ -41,4 +41,9 @@ public class User {
     public String getStudycourse() {
         return studycourse;
     }
+
+    @Override
+    public String toString() {
+        return "" + firstName + " " + lastName;
+    }
 }

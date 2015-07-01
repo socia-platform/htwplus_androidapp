@@ -11,22 +11,31 @@ import java.net.URL;
  * auf welches dann global zugegriffen werden kann (Singleton). Diese
  * Klasse ist in der AndroidManifext.xml unter <application> eingetragen.
  *
+ *
+ *
+ * 0.0.2.1	    Router/gateway address
+ * 10.0.2.2	    Special alias to your host loopback interface (i.e., 127.0.0.1 on your development machine)
+ * 10.0.2.3	    First DNS server
+ * 10.0.2.15	The emulated device's own network/ethernet interface
+ * 127.0.0.1	The emulated device's own loopback interface
+ *
  * Created by tino on 23.06.15.
  */
 public class ApplicationController extends Application {
 
     private static ApplicationController mInstance;
     private static URL apiUrl;
+    private static VolleyNetworkController vncInstance;
 
     // "Konstruktor"
     @Override
     public void onCreate() {
         super.onCreate();
         mInstance = this;
-        VolleyNetworkController.getInstance(getApplicationContext());
+        vncInstance = VolleyNetworkController.getInstance(getApplicationContext());
 
         try {
-            apiUrl = new URL("http://192.168.0.212:9000/api/");
+            apiUrl = new URL("http://10.0.2.2:9000/api/");
         } catch (MalformedURLException muex) {
             Toast.makeText(getApplicationContext(), muex.getMessage(), Toast.LENGTH_LONG).show();
         }
@@ -38,6 +47,10 @@ public class ApplicationController extends Application {
 
     public static URL getApiUrl() {
         return apiUrl;
+    }
+
+    public static VolleyNetworkController getVolleyController() {
+        return vncInstance;
     }
 
 }

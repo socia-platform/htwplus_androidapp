@@ -19,14 +19,9 @@ import net.hamnaberg.json.Link;
 import net.hamnaberg.json.Property;
 import net.hamnaberg.json.Query;
 import net.hamnaberg.json.Template;
-import net.hamnaberg.json.Value;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.net.URI;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,6 +67,13 @@ public class VolleyNetworkController {
 
     public void getUser(long userId, Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
         String url = ApplicationController.getApiUrl().toString() + "users/" + userId;
+        final CustomJsonObjectRequest jsonRequest = new CustomJsonObjectRequest(Request.Method.GET, url, new JSONObject(), responseListener, errorListener);
+        jsonRequest.setTag(tag);
+        mRequestQueue.add(jsonRequest);
+    }
+
+    public void getUsers(Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
+        String url = ApplicationController.getApiUrl().toString() + "users";
         final CustomJsonObjectRequest jsonRequest = new CustomJsonObjectRequest(Request.Method.GET, url, new JSONObject(), responseListener, errorListener);
         jsonRequest.setTag(tag);
         mRequestQueue.add(jsonRequest);

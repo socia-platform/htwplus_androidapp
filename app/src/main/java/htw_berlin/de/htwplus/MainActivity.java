@@ -1,21 +1,18 @@
 package htw_berlin.de.htwplus;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
 import net.hamnaberg.json.Collection;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -24,19 +21,12 @@ import java.util.Map;
 import htw_berlin.de.htwplus.datamodel.ApiError;
 import htw_berlin.de.htwplus.datamodel.User;
 import htw_berlin.de.htwplus.util.JsonCollectionHelper;
+import htw_berlin.de.htwplus.view.UserListViewActivity;
 
-
-/*
-0.0.2.1	    Router/gateway address
-10.0.2.2	Special alias to your host loopback interface (i.e., 127.0.0.1 on your development machine)
-10.0.2.3	First DNS server
-10.0.2.15	The emulated device's own network/ethernet interface
-127.0.0.1	The emulated device's own loopback interface
- */
 
 public class MainActivity extends Activity implements Response.Listener, Response.ErrorListener, View.OnClickListener {
     public static final String REQUEST_TAG = "MainVolleyActivity";
-    private String url = "http://192.168.0.212:9000/api/persons";
+    //private String url = "http://10.0.2.2:9000/api/persons";
     private TextView mTextView;
     private Button mButton;
     private Button mButtonPost;
@@ -76,20 +66,22 @@ public class MainActivity extends Activity implements Response.Listener, Respons
 
     @Override
     public void onClick(View v) {
-        if(v == mButton) {
-            VolleyNetworkController.getInstance().getUser(1, REQUEST_TAG, this, this);
+/*        if(v == mButton) {
+            ApplicationController.getVolleyController().getUser(1, REQUEST_TAG, this, this);
         } else if(v == mButtonPost) {
             try {
                 String postMessage = mEditText.getText().toString();
                 if (!postMessage.isEmpty())
-                    VolleyNetworkController.getInstance().addPost(postMessage, 1, 1, null, null, REQUEST_TAG, this, this);
+                    ApplicationController.getVolleyController().addPost(postMessage, 1, 1, null, null, REQUEST_TAG, this, this);
                 else
                     Toast.makeText(getApplicationContext(), "Bitte Post-Message eingeben!", Toast.LENGTH_LONG).show();
             } catch (JSONException jex) {
                 Toast.makeText(getApplicationContext(), "JSON parse Exception!\nSiehe konsole!", Toast.LENGTH_LONG).show();
                 jex.printStackTrace();
             }
-        }
+        }*/
+        Intent intent = new Intent(this, UserListViewActivity.class);
+        MainActivity.this.startActivity(intent);
     }
 
     @Override
@@ -102,8 +94,9 @@ public class MainActivity extends Activity implements Response.Listener, Respons
     public void onErrorResponse(VolleyError error) {
         mTextView.setText("Error\n");
         if (error != null) {
-            mTextView.setText(mTextView.getText() + error.getMessage());
-            if (error.getMessage().contains("org.json.JSONException: End of input at character 0"))
+            String errorMessage = error.getMessage() != null ? error.getMessage() : "";
+            mTextView.setText(mTextView.getText() + errorMessage);
+            if (errorMessage.contains("org.json.JSONException: End of input at character 0"))
                 mTextView.setText(mTextView.getText() + "\nVolley erwartet hier eine Antwort " +
                         "mit JSON im Body was aber bei einem POST Request keinen Sinn macht.\n" +
                         "Hier muss die Methode parseNetworkResponse() überschrieben werden.\n" +
