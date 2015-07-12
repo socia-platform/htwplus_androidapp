@@ -32,10 +32,6 @@
             android:name=".view.UserListViewActivity"
             android:label="@string/title_activity_user_list_view" >
         </activity>
-        <activity
-            android:name=".NavigationDrawerActivity"
-            android:label="@string/title_activity_navigation_drawer" >
-        </activity>
     </application>
 
 </manifest>

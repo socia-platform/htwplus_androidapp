@@ -36,7 +36,7 @@ public class UserListViewActivity extends Activity implements Response.Listener,
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_list_view);
         mlist = new ArrayList<User>();
-        ApplicationController.getVolleyController().getUsers(this, this, this, this);
+        ApplicationController.getVolleyController().getUsers(this, this, this);
         listview = (ListView) findViewById(R.id.list);
         mAdapter = new ArrayAdapter<User>(this, android.R.layout.simple_list_item_1, mlist);
         listview.setAdapter(mAdapter);

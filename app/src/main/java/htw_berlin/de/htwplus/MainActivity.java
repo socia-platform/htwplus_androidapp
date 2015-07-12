@@ -25,11 +25,9 @@ import htw_berlin.de.htwplus.view.UserListViewActivity;
 
 public class MainActivity extends Activity implements Response.Listener, Response.ErrorListener, View.OnClickListener {
     public static final String REQUEST_TAG = "MainVolleyActivity";
-    //private String url = "http://10.0.2.2:9000/api/persons";
     private TextView mTextView;
     private Button mButton;
     private Button mButtonPost;
-    //private RequestQueue mQueue;
     private EditText mEditText;
 
     @Override
@@ -79,11 +77,8 @@ public class MainActivity extends Activity implements Response.Listener, Respons
                 jex.printStackTrace();
             }
         }*/
-        /*
+
         Intent intent = new Intent(this, UserListViewActivity.class);
-        MainActivity.this.startActivity(intent);
-        */
-        Intent intent = new Intent(this, NavigationDrawerActivity.class);
         MainActivity.this.startActivity(intent);
     }
 
