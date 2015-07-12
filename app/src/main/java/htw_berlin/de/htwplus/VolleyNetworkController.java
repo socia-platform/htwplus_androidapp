@@ -74,7 +74,7 @@ public class VolleyNetworkController {
         mRequestQueue.add(jsonRequest);
     }
 
-    public void getUsers(UserListViewActivity userListViewActivity, Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
+    public void getUsers(Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
         String url = ApplicationController.getApiUrl().toString() + "users";
         final CustomJsonObjectRequest jsonRequest = new CustomJsonObjectRequest(Request.Method.GET, url, new JSONObject(), responseListener, errorListener);
         jsonRequest.setTag(tag);
@@ -82,6 +82,10 @@ public class VolleyNetworkController {
     }
 
     public void getPost(long postId, Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
+        throw new UnsupportedOperationException("getPost() still need to be implemented.");
+    }
+
+    public void getPostsFromNewsstream(Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
         throw new UnsupportedOperationException("getPost() still need to be implemented.");
     }
 
