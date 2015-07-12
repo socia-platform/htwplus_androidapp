@@ -1,4 +1,4 @@
-package htw_berlin.de.htwplus;
+package htw_berlin.de.htwplus.view;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -17,10 +17,13 @@ import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Map;
+
+import htw_berlin.de.htwplus.CustomJsonObjectRequest;
+import htw_berlin.de.htwplus.R;
+import htw_berlin.de.htwplus.VolleyNetworkController;
 import htw_berlin.de.htwplus.datamodel.ApiError;
 import htw_berlin.de.htwplus.datamodel.User;
 import htw_berlin.de.htwplus.util.JsonCollectionHelper;
-import htw_berlin.de.htwplus.view.UserListViewActivity;
 
 
 public class MainActivity extends Activity implements Response.Listener, Response.ErrorListener, View.OnClickListener {
