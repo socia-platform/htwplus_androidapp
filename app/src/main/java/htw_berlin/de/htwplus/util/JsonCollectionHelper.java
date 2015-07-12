@@ -12,6 +12,7 @@ import net.hamnaberg.json.Item;
 import net.hamnaberg.json.parser.CollectionParser;
 
 import htw_berlin.de.htwplus.datamodel.ApiError;
+import htw_berlin.de.htwplus.datamodel.Post;
 import htw_berlin.de.htwplus.datamodel.User;
 
 /**
@@ -42,6 +43,25 @@ public class JsonCollectionHelper {
             }
         }
         return users;
+    }
+
+    public static List<Post> toPosts(Collection collection) {
+        List<Post> posts = new ArrayList<Post>();
+        for (Item item : collection.getItems()) {
+            Data data = item.getData();
+            /*
+            boolean propertyOk = ((hasProperty("firstname", data)) && (hasProperty("lastname", data))
+                    && (hasProperty("email", data)) && (hasProperty("studycourse", data)));
+            if (propertyOk) {
+                String firstName = data.propertyByName("firstname").get().hasValue() ? firstName = data.propertyByName("firstname").get().getValue().get().asString() : "";
+                String lastName = data.propertyByName("lastname").get().hasValue() ? data.propertyByName("lastname").get().getValue().get().asString() : "";
+                String email = data.propertyByName("email").get().hasValue() ? email = data.propertyByName("email").get().getValue().get().asString() : "";
+                String course = data.propertyByName("studycourse").get().hasValue() ? data.propertyByName("studycourse").get().getValue().get().asString() : "";
+                posts.add(new User(firstName, lastName, email, course));
+            }
+            */
+        }
+        return posts;
     }
 
     public static ApiError toError(Collection collection) {

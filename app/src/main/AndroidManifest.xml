@@ -36,6 +36,10 @@
             android:name=".view.ShowUserActivity"
             android:label="@string/title_activity_show_user" >
         </activity>
+        <activity
+            android:name=".view.PostListViewActivity"
+            android:label="@string/title_activity_post_list_view" >
+        </activity>
     </application>
 
 </manifest>

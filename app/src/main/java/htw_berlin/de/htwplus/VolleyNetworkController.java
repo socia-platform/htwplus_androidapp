@@ -82,11 +82,17 @@ public class VolleyNetworkController {
     }
 
     public void getPost(long postId, Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
-        throw new UnsupportedOperationException("getPost() still need to be implemented.");
+        String url = ApplicationController.getApiUrl().toString() + "posts/" + postId;
+        final CustomJsonObjectRequest jsonRequest = new CustomJsonObjectRequest(Request.Method.GET, url, new JSONObject(), responseListener, errorListener);
+        jsonRequest.setTag(tag);
+        mRequestQueue.add(jsonRequest);
     }
 
     public void getPostsFromNewsstream(Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
-        throw new UnsupportedOperationException("getPost() still need to be implemented.");
+        String url = ApplicationController.getApiUrl().toString() + "posts";
+        final CustomJsonObjectRequest jsonRequest = new CustomJsonObjectRequest(Request.Method.GET, url, new JSONObject(), responseListener, errorListener);
+        jsonRequest.setTag(tag);
+        mRequestQueue.add(jsonRequest);
     }
 
     public void addPost(String content, long accountId, long ownerId, Optional<Long> parentId, Optional<Long> groupId, Object tag,

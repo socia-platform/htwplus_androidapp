@@ -12,4 +12,5 @@
     <string name="title_section3">Section 3</string>
 
     <string name="app_not_available">Sorry, there\'s no web browser available</string>
+    <string name="title_activity_post_list_view">PostListViewActivity</string>
 </resources>
