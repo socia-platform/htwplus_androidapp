@@ -2,7 +2,6 @@ package htw_berlin.de.htwplus.view;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -15,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import htw_berlin.de.htwplus.ApplicationController;
+import htw_berlin.de.htwplus.PostAdapter;
 import htw_berlin.de.htwplus.R;
 import htw_berlin.de.htwplus.datamodel.ApiError;
 import htw_berlin.de.htwplus.datamodel.Post;
@@ -22,28 +22,30 @@ import htw_berlin.de.htwplus.util.JsonCollectionHelper;
 
 public class PostListViewActivity extends Activity implements Response.Listener, Response.ErrorListener {
 
-    private ArrayList<Post> mlist;
-    private ArrayAdapter<Post> mAdapter;
-    private ListView listview;
+    private ArrayList<Post> mPostlist;
+    private ArrayList<Post> mPostCommentlist;;
+    private PostAdapter mPostAdapter;
+    private ListView mlistview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_list_view);
-        mlist = new ArrayList<Post>();
+        mPostlist = new ArrayList<Post>();
+        mPostCommentlist = new ArrayList<Post>();
         ApplicationController.getVolleyController().getPostsFromNewsstream(this, this, this);
-        listview = (ListView) findViewById(R.id.list);
-        mAdapter = new ArrayAdapter<Post>(this, android.R.layout.simple_list_item_1, mlist);
-        listview.setAdapter(mAdapter);
+        mlistview = (ListView) findViewById(R.id.list);
+        mPostAdapter = new PostAdapter(this, R.layout.post_listview_item_row, mPostlist);
+        mlistview.setAdapter(mPostAdapter);
         /*
-        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mlistview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(view.getContext(), ShowUserActivity.class);
-                intent.putExtra("Firstname", mlist.get(position).getFirstName());
-                intent.putExtra("Lastname", mlist.get(position).getLastName());
-                intent.putExtra("Email", mlist.get(position).getEmail());
-                intent.putExtra("Class", mlist.get(position).getClass());
+                intent.putExtra("Firstname", mPostlist.get(position).getFirstName());
+                intent.putExtra("Lastname", mPostlist.get(position).getLastName());
+                intent.putExtra("Email", mPostlist.get(position).getEmail());
+                intent.putExtra("Class", mPostlist.get(position).getClass());
                 UserListViewActivity.this.startActivity(intent);
             }
         });
@@ -65,8 +67,13 @@ public class PostListViewActivity extends Activity implements Response.Listener,
             Collection collection = JsonCollectionHelper.parse(response.toString());
             if (!JsonCollectionHelper.hasError(collection)) {
                 List<Post> posts = JsonCollectionHelper.toPosts(collection);
-                for (Post post : posts)
-                    mlist.add(post);
+                for (Post post : posts) {
+                    if (post.isCommentPost())
+                        mPostCommentlist.add(post);
+                    else
+                        mPostlist.add(post);
+                }
+                mPostAdapter.notifyDataSetChanged();;
             } else {
                 ApiError apiError = JsonCollectionHelper.toError(collection);
             }

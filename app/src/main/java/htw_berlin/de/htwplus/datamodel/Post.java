@@ -4,6 +4,7 @@ import net.hamnaberg.json.Item;
 import net.hamnaberg.json.Link;
 import net.hamnaberg.json.Query;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,6 +20,17 @@ public class Post {
     private List<Link> links;
     private List<Query> queries;
     private List<Item> items;
+
+    public Post(String content, int accountId, int ownerId, int parentId, int groupId) {
+        this.content = content;
+        this.accountId = accountId;
+        this.ownerId = ownerId;
+        this.parentId = parentId;
+        this.groupId = groupId;
+        this.links = new ArrayList<Link>();
+        this.items = new ArrayList<Item>();
+        this.queries = new ArrayList<Query>();
+    }
 
     public Post(String content, int accountId, int ownerId, int parentId, int groupId, List<Link> links, List<Query> queries, List<Item> items) {
         this.content = content;
@@ -109,5 +121,17 @@ public class Post {
                 ", queries=" + queries +
                 ", items=" + items +
                 '}';
+    }
+
+    public boolean isCommentPost() {
+        return (parentId > -1);
+    }
+
+    public boolean isGroupPost() {
+        return ((groupId > -1) && (parentId == -1));
+    }
+
+    public boolean isGroupCommentPost() {
+        return ((groupId > -1) && (parentId > -1));
     }
 }

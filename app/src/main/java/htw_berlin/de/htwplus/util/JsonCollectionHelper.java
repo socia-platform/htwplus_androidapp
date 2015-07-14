@@ -35,9 +35,9 @@ public class JsonCollectionHelper {
             boolean propertyOk = ((hasProperty("firstname", data)) && (hasProperty("lastname", data))
                                  && (hasProperty("email", data)) && (hasProperty("studycourse", data)));
             if (propertyOk) {
-                String firstName = data.propertyByName("firstname").get().hasValue() ? firstName = data.propertyByName("firstname").get().getValue().get().asString() : "";
+                String firstName = data.propertyByName("firstname").get().hasValue() ? data.propertyByName("firstname").get().getValue().get().asString() : "";
                 String lastName = data.propertyByName("lastname").get().hasValue() ? data.propertyByName("lastname").get().getValue().get().asString() : "";
-                String email = data.propertyByName("email").get().hasValue() ? email = data.propertyByName("email").get().getValue().get().asString() : "";
+                String email = data.propertyByName("email").get().hasValue() ? data.propertyByName("email").get().getValue().get().asString() : "";
                 String course = data.propertyByName("studycourse").get().hasValue() ? data.propertyByName("studycourse").get().getValue().get().asString() : "";
                 users.add(new User(firstName, lastName, email, course));
             }
@@ -49,17 +49,18 @@ public class JsonCollectionHelper {
         List<Post> posts = new ArrayList<Post>();
         for (Item item : collection.getItems()) {
             Data data = item.getData();
-            /*
-            boolean propertyOk = ((hasProperty("firstname", data)) && (hasProperty("lastname", data))
-                    && (hasProperty("email", data)) && (hasProperty("studycourse", data)));
+            boolean propertyOk = ((hasProperty("content", data)) && (hasProperty("parent_id", data))
+                    && (hasProperty("group_id", data)) && (hasProperty("account_id", data))
+                    && (hasProperty("owner_id", data)));
+
             if (propertyOk) {
-                String firstName = data.propertyByName("firstname").get().hasValue() ? firstName = data.propertyByName("firstname").get().getValue().get().asString() : "";
-                String lastName = data.propertyByName("lastname").get().hasValue() ? data.propertyByName("lastname").get().getValue().get().asString() : "";
-                String email = data.propertyByName("email").get().hasValue() ? email = data.propertyByName("email").get().getValue().get().asString() : "";
-                String course = data.propertyByName("studycourse").get().hasValue() ? data.propertyByName("studycourse").get().getValue().get().asString() : "";
-                posts.add(new User(firstName, lastName, email, course));
+                String content = data.propertyByName("content").get().hasValue() ? data.propertyByName("content").get().getValue().get().asString() : "";
+                int parentId = data.propertyByName("parent_id").get().hasValue() ? Integer.parseInt(data.propertyByName("parent_id").get().getValue().get().asString()) : -1;
+                int groupId = data.propertyByName("group_id").get().hasValue() ? Integer.parseInt(data.propertyByName("group_id").get().getValue().get().asString()) : -1;
+                int accountId = data.propertyByName("account_id").get().hasValue() ? Integer.parseInt(data.propertyByName("account_id").get().getValue().get().asString()) : -1;
+                int ownerId = data.propertyByName("owner_id").get().hasValue() ? Integer.parseInt(data.propertyByName("owner_id").get().getValue().get().asString()) : -1;
+                posts.add(new Post(content, accountId, ownerId, parentId, groupId));
             }
-            */
         }
         return posts;
     }
