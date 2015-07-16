@@ -11,6 +11,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import htw_berlin.de.htwplus.datamodel.Post;
+import htw_berlin.de.htwplus.datamodel.User;
 
 /**
  * Created by tino on 14.07.15.
@@ -20,12 +21,14 @@ public class PostAdapter extends ArrayAdapter<Post> {
     private Context context;
     private int layoutResourceId;
     private List<Post> posts;
+    private List<User> users;
 
-    public PostAdapter(Context context, int layoutResourceId, List<Post> data) {
+    public PostAdapter(Context context, int layoutResourceId, List<Post> data, List<User> userData) {
         super(context, layoutResourceId, data);
         this.layoutResourceId = layoutResourceId;
         this.context = context;
         this.posts = data;
+        this.users = userData;
     }
 
     @Override
@@ -35,18 +38,18 @@ public class PostAdapter extends ArrayAdapter<Post> {
             LayoutInflater inflater = ((Activity) context).getLayoutInflater();
             row = inflater.inflate(layoutResourceId, parent, false);
         }
-        Post post = posts.get(position);
         TextView userNameTextView = (TextView) row.findViewById(R.id.userNameTextView);
         TextView createDateTimeTextView = (TextView) row.findViewById(R.id.createDateTimeTextView);
         TextView postContentTextView = (TextView) row.findViewById(R.id.postContentTextView);
         TextView labelGroupNameTextView = (TextView) row.findViewById(R.id.labelGroupNameTextView);
         TextView groupNameTextView = (TextView) row.findViewById(R.id.groupNameTextView);
+        Post post = posts.get(position);
         if (post != null) {
-            if (userNameTextView != null)
-                if (post.isGroupPost())
-                    userNameTextView.setText(String.valueOf(post.getOwnerId()));
-                else
-                    userNameTextView.setText(String.valueOf(post.getAccountId()));
+            if (userNameTextView != null) {
+                User user = post.isGroupPost() ? findUser(post.getOwnerId()) : findUser(post.getAccountId());
+                String userName = (user != null) ? user.toString() : "unkown";
+                userNameTextView.setText(userName);
+            }
             if (createDateTimeTextView != null)
                 // Erstelldatum und -zeit werden (noch) nicht von der RestApi geliefert
                 createDateTimeTextView.setText("01.01.1999 22:22 Uhr");
@@ -59,5 +62,15 @@ public class PostAdapter extends ArrayAdapter<Post> {
             }
         }
         return row;
+    }
+
+    private User findUser(long accountId) {
+        User user = null;
+        for (User aUser : users)
+            if (aUser.getAccountId() == accountId) {
+                user = aUser;
+                break;
+            }
+        return user;
     }
 }

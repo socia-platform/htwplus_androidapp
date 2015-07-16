@@ -3,6 +3,7 @@ package htw_berlin.de.htwplus.util;
 import com.fasterxml.jackson.databind.util.Converter;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,14 +33,19 @@ public class JsonCollectionHelper {
         List<User> users = new ArrayList<User>();
         for (Item item : collection.getItems()) {
             Data data = item.getData();
+            boolean hrefOk = (!item.getHref().isNone());
             boolean propertyOk = ((hasProperty("firstname", data)) && (hasProperty("lastname", data))
                                  && (hasProperty("email", data)) && (hasProperty("studycourse", data)));
-            if (propertyOk) {
+            if (hrefOk && propertyOk) {
+                URI resourceUri = item.getHref().get();
+                String[] segments = resourceUri.getPath().split("/");
+                String idStr = segments[segments.length-1];
+                int accountId = Integer.parseInt(idStr);
                 String firstName = data.propertyByName("firstname").get().hasValue() ? data.propertyByName("firstname").get().getValue().get().asString() : "";
                 String lastName = data.propertyByName("lastname").get().hasValue() ? data.propertyByName("lastname").get().getValue().get().asString() : "";
                 String email = data.propertyByName("email").get().hasValue() ? data.propertyByName("email").get().getValue().get().asString() : "";
                 String course = data.propertyByName("studycourse").get().hasValue() ? data.propertyByName("studycourse").get().getValue().get().asString() : "";
-                users.add(new User(firstName, lastName, email, course));
+                users.add(new User(accountId, firstName, lastName, email, course));
             }
         }
         return users;

@@ -18,12 +18,14 @@ import htw_berlin.de.htwplus.PostAdapter;
 import htw_berlin.de.htwplus.R;
 import htw_berlin.de.htwplus.datamodel.ApiError;
 import htw_berlin.de.htwplus.datamodel.Post;
+import htw_berlin.de.htwplus.datamodel.User;
 import htw_berlin.de.htwplus.util.JsonCollectionHelper;
 
 public class PostListViewActivity extends Activity implements Response.Listener, Response.ErrorListener {
 
     private ArrayList<Post> mPostlist;
-    private ArrayList<Post> mPostCommentlist;;
+    private ArrayList<Post> mPostCommentlist;
+    private ArrayList<User> mUserlist;
     private PostAdapter mPostAdapter;
     private ListView mlistview;
 
@@ -33,9 +35,11 @@ public class PostListViewActivity extends Activity implements Response.Listener,
         setContentView(R.layout.activity_post_list_view);
         mPostlist = new ArrayList<Post>();
         mPostCommentlist = new ArrayList<Post>();
+        mUserlist = new ArrayList<User>();
         ApplicationController.getVolleyController().getPostsFromNewsstream(this, this, this);
+        ApplicationController.getVolleyController().getUsers(this, this, this);
         mlistview = (ListView) findViewById(R.id.list);
-        mPostAdapter = new PostAdapter(this, R.layout.post_listview_item_row, mPostlist);
+        mPostAdapter = new PostAdapter(this, R.layout.post_listview_item_row, mPostlist, mUserlist);
         mlistview.setAdapter(mPostAdapter);
         /*
         mlistview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -66,14 +70,20 @@ public class PostListViewActivity extends Activity implements Response.Listener,
         try {
             Collection collection = JsonCollectionHelper.parse(response.toString());
             if (!JsonCollectionHelper.hasError(collection)) {
-                List<Post> posts = JsonCollectionHelper.toPosts(collection);
-                for (Post post : posts) {
-                    if (post.isCommentPost())
-                        mPostCommentlist.add(post);
-                    else
-                        mPostlist.add(post);
+                if (collection.getHref().get().getPath().contains("api/posts")) {
+                    List<Post> posts = JsonCollectionHelper.toPosts(collection);
+                    for (Post post : posts) {
+                        if (post.isCommentPost())
+                            mPostCommentlist.add(post);
+                        else
+                            mPostlist.add(post);
+                    }
+                } else if (collection.getHref().get().getPath().contains("api/users")) {
+                    List<User> users = JsonCollectionHelper.toUsers(collection);
+                    for (User user : users)
+                        mUserlist.add(user);
                 }
-                mPostAdapter.notifyDataSetChanged();;
+                mPostAdapter.notifyDataSetChanged();
             } else {
                 ApiError apiError = JsonCollectionHelper.toError(collection);
             }
@@ -81,4 +91,5 @@ public class PostListViewActivity extends Activity implements Response.Listener,
             e.printStackTrace();
         }
     }
+
 }

@@ -92,6 +92,7 @@ public class UserListViewActivity extends Activity implements Response.Listener,
                 List<User> users = JsonCollectionHelper.toUsers(collection);
                 for (User user : users)
                     mlist.add(user);
+                mAdapter.notifyDataSetChanged();
             } else {
                 ApiError apiError = JsonCollectionHelper.toError(collection);
             }
