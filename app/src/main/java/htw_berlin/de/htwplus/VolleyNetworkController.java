@@ -95,26 +95,34 @@ public class VolleyNetworkController {
         mRequestQueue.add(jsonRequest);
     }
 
-    public void addPost(String content, long accountId, long ownerId, Optional<Long> parentId, Optional<Long> groupId, Object tag,
+    public void addPost(String content, Optional<Long> accountId, Optional<Long> ownerId, Optional<Long> parentId, Optional<Long> groupId, Object tag,
                         Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) throws JSONException {
-        URI resourceUri = URI.create(ApplicationController.getApiUrl() + "users/1");
+        URI resourceUri = URI.create(ApplicationController.getApiUrl() + "users/" + String.valueOf(accountId.get()));
         List<Link> links = new ArrayList<Link>();
         List<Query> queries = new ArrayList<Query>();
 
         List<Item> items = new ArrayList<Item>();
         Property contentProp = Property.value("content", Optional.some("The content."), content);
-        Property accIdProp = Property.value("account_id", Optional.some("The account id."), accountId);
-        Property ownerIdProp = Property.value("owner_id", Optional.some("The owner id."), ownerId);
+        Property accIdProp = null;
+        if (Optional.fromNullable(accountId).isNone())
+            accIdProp = Property.value("account_id", Optional.some("The account id."), "");
+        else
+            accIdProp = Property.value("account_id", Optional.some("The account id."), accountId.get());
+        Property ownerIdProp = null;
+        if (Optional.fromNullable(ownerId).isNone())
+            ownerIdProp = Property.value("owner_id", Optional.some("The owner id."), "");
+        else
+            ownerIdProp = Property.value("owner_id", Optional.some("The owner id."), ownerId.get());
         Property parentIdProp = null;
         if (Optional.fromNullable(parentId).isNone())
             parentIdProp = Property.value("parent_id", Optional.some("The parent id."), "");
         else
-            parentIdProp = Property.value("parent_id", Optional.some("The parent id."), parentId);
+            parentIdProp = Property.value("parent_id", Optional.some("The parent id."), parentId.get());
         Property groupIdProp = null;
         if (Optional.fromNullable(groupId).isNone())
             groupIdProp = Property.value("group_id", Optional.some("The group id."), "");
         else
-            groupIdProp = Property.value("group_id", Optional.some("The group id."), groupId);
+            groupIdProp = Property.value("group_id", Optional.some("The group id."), groupId.get());
         Item.Builder itemBuilder = Item.builder(resourceUri);
         itemBuilder.addProperty(contentProp);
         itemBuilder.addProperty(accIdProp);

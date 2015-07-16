@@ -59,6 +59,9 @@ public class PostAdapter extends ArrayAdapter<Post> {
                 labelGroupNameTextView.setVisibility(View.VISIBLE);
                 groupNameTextView.setVisibility(View.VISIBLE);
                 groupNameTextView.setText(String.valueOf(post.getGroupId()));
+            } else {
+                labelGroupNameTextView.setVisibility(View.INVISIBLE);
+                groupNameTextView.setVisibility(View.INVISIBLE);
             }
         }
         return row;
