@@ -46,7 +46,11 @@ public class PostAdapter extends ArrayAdapter<Post> {
         Post post = posts.get(position);
         if (post != null) {
             if (userNameTextView != null) {
-                User user = post.isGroupPost() ? findUser(post.getOwnerId()) : findUser(post.getAccountId());
+                User user = null;
+                if (post.isCommentPost() || post.isGroupCommentPost() || post.isGroupPost())
+                    user = findUser(post.getOwnerId());
+                else
+                    user = findUser(post.getAccountId());
                 String userName = (user != null) ? user.toString() : "unkown";
                 userNameTextView.setText(userName);
             }
@@ -55,7 +59,8 @@ public class PostAdapter extends ArrayAdapter<Post> {
                 createDateTimeTextView.setText("01.01.1999 22:22 Uhr");
             if (postContentTextView != null)
                 postContentTextView.setText(post.getContent());
-            if ((labelGroupNameTextView != null) && (groupNameTextView != null) && (post.isGroupPost())) {
+            if ((labelGroupNameTextView != null) && (groupNameTextView != null) &&
+                    ((post.isGroupPost()) || (post.isGroupCommentPost()))) {
                 labelGroupNameTextView.setVisibility(View.VISIBLE);
                 groupNameTextView.setVisibility(View.VISIBLE);
                 groupNameTextView.setText(String.valueOf(post.getGroupId()));

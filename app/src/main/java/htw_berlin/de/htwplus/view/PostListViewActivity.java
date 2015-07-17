@@ -1,8 +1,10 @@
 package htw_berlin.de.htwplus.view;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -52,19 +54,14 @@ public class PostListViewActivity extends Activity implements Response.Listener,
         mlistview = (ListView) findViewById(R.id.list);
         mPostAdapter = new PostAdapter(this, R.layout.post_listview_item_row, mPostlist, mUserlist);
         mlistview.setAdapter(mPostAdapter);
-        /*
         mlistview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(view.getContext(), ShowUserActivity.class);
-                intent.putExtra("Firstname", mPostlist.get(position).getFirstName());
-                intent.putExtra("Lastname", mPostlist.get(position).getLastName());
-                intent.putExtra("Email", mPostlist.get(position).getEmail());
-                intent.putExtra("Class", mPostlist.get(position).getClass());
-                UserListViewActivity.this.startActivity(intent);
+                Intent intent = new Intent(view.getContext(), ShowPostActivity.class);
+                intent.putExtra("postId", mPostlist.get(position).getPostId());
+                PostListViewActivity.this.startActivity(intent);
             }
         });
-        */
     }
 
     @Override

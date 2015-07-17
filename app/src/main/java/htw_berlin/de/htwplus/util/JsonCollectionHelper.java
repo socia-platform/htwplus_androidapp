@@ -55,17 +55,22 @@ public class JsonCollectionHelper {
         List<Post> posts = new ArrayList<Post>();
         for (Item item : collection.getItems()) {
             Data data = item.getData();
+            boolean hrefOk = (!item.getHref().isNone());
             boolean propertyOk = ((hasProperty("content", data)) && (hasProperty("parent_id", data))
                     && (hasProperty("group_id", data)) && (hasProperty("account_id", data))
                     && (hasProperty("owner_id", data)));
 
-            if (propertyOk) {
+            if (hrefOk && propertyOk) {
+                URI resourceUri = item.getHref().get();
+                String[] segments = resourceUri.getPath().split("/");
+                String idStr = segments[segments.length-1];
+                int postId = Integer.parseInt(idStr);
                 String content = data.propertyByName("content").get().hasValue() ? data.propertyByName("content").get().getValue().get().asString() : "";
                 int parentId = data.propertyByName("parent_id").get().hasValue() ? Integer.parseInt(data.propertyByName("parent_id").get().getValue().get().asString()) : -1;
                 int groupId = data.propertyByName("group_id").get().hasValue() ? Integer.parseInt(data.propertyByName("group_id").get().getValue().get().asString()) : -1;
                 int accountId = data.propertyByName("account_id").get().hasValue() ? Integer.parseInt(data.propertyByName("account_id").get().getValue().get().asString()) : -1;
                 int ownerId = data.propertyByName("owner_id").get().hasValue() ? Integer.parseInt(data.propertyByName("owner_id").get().getValue().get().asString()) : -1;
-                posts.add(new Post(content, accountId, ownerId, parentId, groupId));
+                posts.add(new Post(postId, content, accountId, ownerId, parentId, groupId));
             }
         }
         return posts;
