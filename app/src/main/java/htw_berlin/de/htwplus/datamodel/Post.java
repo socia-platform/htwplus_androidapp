@@ -10,8 +10,9 @@ import java.util.List;
 /**
  * Created by tim on 01.07.15.
  */
-public class Post {
+public class Post implements Comparable<Post> {
 
+    private int postId;
     private String content;
     private int accountId;
     private int ownerId;
@@ -21,7 +22,8 @@ public class Post {
     private List<Query> queries;
     private List<Item> items;
 
-    public Post(String content, int accountId, int ownerId, int parentId, int groupId) {
+    public Post(int postId, String content, int accountId, int ownerId, int parentId, int groupId) {
+        this.postId = postId;
         this.content = content;
         this.accountId = accountId;
         this.ownerId = ownerId;
@@ -32,7 +34,8 @@ public class Post {
         this.queries = new ArrayList<Query>();
     }
 
-    public Post(String content, int accountId, int ownerId, int parentId, int groupId, List<Link> links, List<Query> queries, List<Item> items) {
+    public Post(int postId, String content, int accountId, int ownerId, int parentId, int groupId, List<Link> links, List<Query> queries, List<Item> items) {
+        this.postId = postId;
         this.content = content;
         this.accountId = accountId;
         this.ownerId = ownerId;
@@ -44,6 +47,10 @@ public class Post {
     }
 
     // Setters and Getters
+
+    public int getPostId() {
+        return postId;
+    }
 
     public String getContent() {
         return content;
@@ -133,5 +140,15 @@ public class Post {
 
     public boolean isGroupCommentPost() {
         return ((groupId > -1) && (parentId > -1));
+    }
+
+    @Override
+    public int compareTo(Post post) {
+        int result = 0;
+        if (postId > post.getPostId())
+            result = 1;
+        else if (postId < post.getPostId())
+            result = -1;
+        return result;
     }
 }
