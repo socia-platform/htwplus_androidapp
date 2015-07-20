@@ -67,6 +67,13 @@ public class VolleyNetworkController {
         mRequestQueue.cancelAll(tag);
     }
 
+    public void getAccessToken(String authToken, Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
+        String url = ApplicationController.getApiUrl().toString() + "oauth2/token?authorizationCode=" + authToken;
+        final CustomJsonObjectRequest jsonRequest = new CustomJsonObjectRequest(Request.Method.GET, url, new JSONObject(), responseListener, errorListener);
+        jsonRequest.setTag(tag);
+        mRequestQueue.add(jsonRequest);
+    }
+
     public void getUser(long userId, Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
         String url = ApplicationController.getApiUrl().toString() + "users/" + userId;
         final CustomJsonObjectRequest jsonRequest = new CustomJsonObjectRequest(Request.Method.GET, url, new JSONObject(), responseListener, errorListener);

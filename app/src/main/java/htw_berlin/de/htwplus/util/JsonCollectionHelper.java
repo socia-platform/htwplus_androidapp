@@ -76,6 +76,18 @@ public class JsonCollectionHelper {
         return posts;
     }
 
+    public static String extractAccessToken(Collection collection) {
+        String accessToken = null;
+        for (Item item : collection.getItems()) {
+            Data data = item.getData();
+            boolean propertyOk = (hasProperty("access_token", data));
+            if (propertyOk) {
+                accessToken = data.propertyByName("access_token").get().hasValue() ? data.propertyByName("access_token").get().getValue().get().asString() : null;
+            }
+        }
+        return accessToken;
+    }
+
     public static ApiError toError(Collection collection) {
         net.hamnaberg.json.Error error = collection.getError().get();
         return new ApiError(error.getTitle(), error.getMessage(), error.getCode());

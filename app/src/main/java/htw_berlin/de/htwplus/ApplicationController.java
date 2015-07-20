@@ -1,6 +1,7 @@
 package htw_berlin.de.htwplus;
 
 import android.app.Application;
+import android.content.SharedPreferences;
 import android.widget.Toast;
 
 import java.net.MalformedURLException;
@@ -24,8 +25,8 @@ import java.net.URL;
 public class ApplicationController extends Application {
 
     private static ApplicationController mInstance;
-    private static URL apiUrl;
     private static VolleyNetworkController vncInstance;
+    private static SharedPreferencesController spcInstance;
 
     // "Konstruktor"
     @Override
@@ -33,12 +34,9 @@ public class ApplicationController extends Application {
         super.onCreate();
         mInstance = this;
         vncInstance = VolleyNetworkController.getInstance(getApplicationContext());
-
-        try {
-            apiUrl = new URL("http://10.0.2.2:9000/api/");
-        } catch (MalformedURLException muex) {
-            Toast.makeText(getApplicationContext(), muex.getMessage(), Toast.LENGTH_LONG).show();
-        }
+        spcInstance = SharedPreferencesController.getInstance(getApplicationContext(),
+                                                                "AppPreferences",
+                                                                MODE_PRIVATE);
     }
 
     public static synchronized ApplicationController getInstance() {
@@ -46,11 +44,15 @@ public class ApplicationController extends Application {
     }
 
     public static URL getApiUrl() {
-        return apiUrl;
+        return spcInstance.getApiUrl();
     }
 
     public static VolleyNetworkController getVolleyController() {
         return vncInstance;
+    }
+
+    public static SharedPreferencesController getSharedPrefController() {
+        return spcInstance;
     }
 
 }
