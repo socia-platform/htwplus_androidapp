@@ -81,13 +81,11 @@ public class MainActivity extends Activity implements Response.Listener, Respons
             }
         }*/
 
-        /*
         Intent intent = new Intent(this, PostListViewActivity.class);
         MainActivity.this.startActivity(intent);
-        */
 
-        Intent intent = new Intent(this, UserListViewActivity.class);
-        MainActivity.this.startActivity(intent);
+/*        Intent intent = new Intent(this, UserListViewActivity.class);
+        MainActivity.this.startActivity(intent);*/
     }
 
     @Override

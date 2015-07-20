@@ -35,7 +35,7 @@ public class ApplicationController extends Application {
         vncInstance = VolleyNetworkController.getInstance(getApplicationContext());
 
         try {
-            apiUrl = new URL("http://192.168.0.212:9000/api/");
+            apiUrl = new URL("http://10.0.2.2:9000/api/");
         } catch (MalformedURLException muex) {
             Toast.makeText(getApplicationContext(), muex.getMessage(), Toast.LENGTH_LONG).show();
         }

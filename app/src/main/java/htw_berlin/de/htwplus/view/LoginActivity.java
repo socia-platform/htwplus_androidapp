@@ -4,10 +4,14 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -18,15 +22,19 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import htw_berlin.de.htwplus.ApplicationController;
 import htw_berlin.de.htwplus.R;
 
 
@@ -52,6 +60,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    private Dialog mAuthDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +93,9 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        mAuthDialog = new Dialog(LoginActivity.this);
+        mAuthDialog.setContentView(R.layout.oauth2_dialog);
     }
 
     private void populateAutoComplete() {
@@ -138,10 +150,77 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
+
+            /*
             mAuthTask = new UserLoginTask(email, password);
             mAuthTask.execute((Void) null);
+            */
+
+            WebView webView = (WebView)mAuthDialog.findViewById(R.id.webv);
+            webView.getSettings().setJavaScriptEnabled(true);
+
+            String clientId = "4f3d4de8-518a-4f64-be38-b260030a0f5d";
+            String htwplusurl = ApplicationController.getApiUrl() + "oauth2/authorize?clientId=" + clientId;
+            //webView.loadUrl(OAUTH_URL + "?redirect_uri=" + REDIRECT_URI + "&response_type=code&client_id=" + CLIENT_ID + "&scope=" + OAUTH_SCOPE);
+            webView.loadUrl(htwplusurl);
+            webView.setWebViewClient(new WebViewClient() {
+
+                boolean authComplete = false;
+                Intent resultIntent = new Intent();
+                String authCode;
+
+                @Override
+                public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                    super.onPageStarted(view, url, favicon);
+                }
+
+                @Override
+                public void onPageFinished(WebView view, String url) {
+                    super.onPageFinished(view, url);
+
+                    if (url.contains("oauth2/authorize") && !authComplete) {
+                        Uri uri = Uri.parse(url);
+                        String wview = view.toString();
+                        authCode = uri.getQueryParameter("authorizationCode");
+                        authComplete = true;
+                        resultIntent.putExtra("authorizationCode", authCode);
+                        //LoginActivity.this.setResult(Activity.RESULT_OK, resultIntent);
+                        //setResult(Activity.RESULT_CANCELED, resultIntent);
+
+                        SharedPreferences pref = getSharedPreferences("AppPref", MODE_PRIVATE);
+                        SharedPreferences.Editor edit = pref.edit();
+                        edit.putString("authorizationCode", authCode);
+                        edit.commit();
+                        mAuthDialog.dismiss();
+                        // Hier Volley-Request mit Auth-Token um endgültigen Token zu bekommen
+                        Toast.makeText(getApplicationContext(), "Authorization Code is: " + authCode, Toast.LENGTH_SHORT).show();
+
+                        // Intent intent = new Intent(this, LoginActivity.class);
+                        // LoginActivity.this.startActivity(intent);
+                    } else if (url.contains("error=access_denied")) {
+                        resultIntent.putExtra("code", authCode);
+                        authComplete = true;
+                        //setResult(Activity.RESULT_CANCELED, resultIntent);
+                        Toast.makeText(getApplicationContext(), "Error Occured", Toast.LENGTH_SHORT).show();
+                        mAuthDialog.dismiss();
+                    }
+                }
+
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView view, String url){
+                    System.out.println(url);
+                    view.loadUrl(url);
+                    String accessToken = url.substring(url.length() - 36, url.length());
+                    Toast.makeText(getApplicationContext(), accessToken, Toast.LENGTH_SHORT);
+                    return false; // then it is not handled by default action
+                }
+            });
+
+            mAuthDialog.show();
+            mAuthDialog.setTitle("Authorize HTWPlus");
+            mAuthDialog.setCancelable(true);
+            }
         }
-    }
 
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
