@@ -21,8 +21,9 @@ public class Post implements Comparable<Post> {
     private List<Link> links;
     private List<Query> queries;
     private List<Item> items;
+    private String creationDate;
 
-    public Post(int postId, String content, int accountId, int ownerId, int parentId, int groupId) {
+    public Post(int postId, String content, int accountId, int ownerId, int parentId, int groupId, String creationDate) {
         this.postId = postId;
         this.content = content;
         this.accountId = accountId;
@@ -32,9 +33,10 @@ public class Post implements Comparable<Post> {
         this.links = new ArrayList<Link>();
         this.items = new ArrayList<Item>();
         this.queries = new ArrayList<Query>();
+        this.creationDate = creationDate;
     }
 
-    public Post(int postId, String content, int accountId, int ownerId, int parentId, int groupId, List<Link> links, List<Query> queries, List<Item> items) {
+    public Post(int postId, String content, int accountId, int ownerId, int parentId, int groupId, List<Link> links, List<Query> queries, List<Item> items, String creationDate) {
         this.postId = postId;
         this.content = content;
         this.accountId = accountId;
@@ -44,6 +46,7 @@ public class Post implements Comparable<Post> {
         this.links = links;
         this.items = items;
         this.queries = queries;
+        this.creationDate = creationDate;
     }
 
     // Setters and Getters
@@ -150,5 +153,9 @@ public class Post implements Comparable<Post> {
         else if (postId < post.getPostId())
             result = -1;
         return result;
+    }
+
+    public String getCreationDate() {
+        return creationDate;
     }
 }

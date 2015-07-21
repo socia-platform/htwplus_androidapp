@@ -24,6 +24,7 @@ import net.hamnaberg.json.Collection;
 import org.apache.http.impl.cookie.BasicClientCookie;
 
 import htw_berlin.de.htwplus.ApplicationController;
+import htw_berlin.de.htwplus.NavActivity;
 import htw_berlin.de.htwplus.R;
 import htw_berlin.de.htwplus.VolleyNetworkController;
 import htw_berlin.de.htwplus.datamodel.ApiError;
@@ -52,8 +53,15 @@ public class MainActivity extends Activity implements Response.Listener, Respons
         mAuthDialog = new Dialog(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen);
         mAuthDialog.setContentView(R.layout.oauth2_dialog);
 
-        if (!ApplicationController.getSharedPrefController().hasAccessToken())
+        //ApplicationController.getSharedPrefController().removeAccessToken();
+        if (!ApplicationController.getSharedPrefController().hasAccessToken()) {
             makeAuthentification();
+            Intent intent = new Intent(getApplicationContext(), NavActivity.class);
+            startActivity(intent);
+        } else {
+            Intent intent = new Intent(getApplicationContext(), NavActivity.class);
+            startActivity(intent);
+        }
     }
 
     @Override
@@ -78,11 +86,11 @@ public class MainActivity extends Activity implements Response.Listener, Respons
             }
         }*/
 
-        Intent intent = new Intent(this, PostListViewActivity.class);
-        MainActivity.this.startActivity(intent);
-
-/*        Intent intent = new Intent(this, UserListViewActivity.class);
+/*            Intent intent = new Intent(this, PostListViewActivity.class);
         MainActivity.this.startActivity(intent);*/
+
+        Intent intent = new Intent(this, UserListViewActivity.class);
+        MainActivity.this.startActivity(intent);
     }
 
     @Override
@@ -120,6 +128,7 @@ public class MainActivity extends Activity implements Response.Listener, Respons
     private void makeAuthentification() {
         WebView webView = (WebView)mAuthDialog.findViewById(R.id.webv);
         webView.getSettings().setJavaScriptEnabled(true);
+        System.out.println(ApplicationController.getSharedPrefController().getAuthorizationUrl().toString());
         webView.loadUrl(ApplicationController.getSharedPrefController().getAuthorizationUrl().toString());
         webView.setWebViewClient(new WebViewClient() {
 

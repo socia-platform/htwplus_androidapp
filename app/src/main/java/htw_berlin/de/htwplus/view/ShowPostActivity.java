@@ -61,8 +61,8 @@ public class ShowPostActivity extends Activity implements Response.Listener, Res
             if (!commentMessage.isEmpty()) {
                 mCreateNewCommentEditText.setText("");
                 ApplicationController.getVolleyController().addPost(commentMessage,
-                                                                    Optional.some(49l),
-                                                                    Optional.some(49l),
+                                                                    Optional.some(28l),
+                                                                    Optional.some(28l),
                                                                     Optional.some(new Long(postId)),
                                                                     null,
                                                                     REQUEST_TAG,

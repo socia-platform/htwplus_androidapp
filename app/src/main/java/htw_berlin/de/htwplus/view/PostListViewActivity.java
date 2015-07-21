@@ -95,7 +95,7 @@ public class PostListViewActivity extends Activity implements Response.Listener,
             String postMessage = mCreateNewPostEditText.getText().toString();
             if (!postMessage.isEmpty()) {
                 mCreateNewPostEditText.setText("");
-                ApplicationController.getVolleyController().addPost(postMessage, Optional.some(49l), Optional.some(49l), null, null, REQUEST_TAG, this, this);
+                ApplicationController.getVolleyController().addPost(postMessage, Optional.some(28l), Optional.some(28l), null, null, REQUEST_TAG, this, this);
                 ApplicationController.getVolleyController().getUsers(this, this, this);
                 ApplicationController.getVolleyController().getPostsFromNewsstream(this, this, this);
             } else

@@ -19,13 +19,13 @@ import net.hamnaberg.json.Link;
 import net.hamnaberg.json.Property;
 import net.hamnaberg.json.Query;
 import net.hamnaberg.json.Template;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-
-import htw_berlin.de.htwplus.view.UserListViewActivity;
 
 public class VolleyNetworkController {
 
@@ -75,28 +75,32 @@ public class VolleyNetworkController {
     }
 
     public void getUser(long userId, Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
-        String url = ApplicationController.getApiUrl().toString() + "users/" + userId;
+        String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
+        String url = ApplicationController.getApiUrl().toString() + "users/" + userId + "?accessToken=" + accessToken;
         final CustomJsonObjectRequest jsonRequest = new CustomJsonObjectRequest(Request.Method.GET, url, new JSONObject(), responseListener, errorListener);
         jsonRequest.setTag(tag);
         mRequestQueue.add(jsonRequest);
     }
 
     public void getUsers(Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
-        String url = ApplicationController.getApiUrl().toString() + "users";
+        String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
+        String url = ApplicationController.getApiUrl().toString() + "users" + "?accessToken=" + accessToken;
         final CustomJsonObjectRequest jsonRequest = new CustomJsonObjectRequest(Request.Method.GET, url, new JSONObject(), responseListener, errorListener);
         jsonRequest.setTag(tag);
         mRequestQueue.add(jsonRequest);
     }
 
     public void getPost(long postId, Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
-        String url = ApplicationController.getApiUrl().toString() + "posts/" + postId;
+        String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
+        String url = ApplicationController.getApiUrl().toString() + "posts/" + postId + "?accessToken=" + accessToken;
         final CustomJsonObjectRequest jsonRequest = new CustomJsonObjectRequest(Request.Method.GET, url, new JSONObject(), responseListener, errorListener);
         jsonRequest.setTag(tag);
         mRequestQueue.add(jsonRequest);
     }
 
     public void getPostsFromNewsstream(Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
-        String url = ApplicationController.getApiUrl().toString() + "posts";
+        String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
+        String url = ApplicationController.getApiUrl().toString() + "posts" + "?accessToken=" + accessToken;
         final CustomJsonObjectRequest jsonRequest = new CustomJsonObjectRequest(Request.Method.GET, url, new JSONObject(), responseListener, errorListener);
         jsonRequest.setTag(tag);
         mRequestQueue.add(jsonRequest);
@@ -104,7 +108,8 @@ public class VolleyNetworkController {
 
     public void addPost(String content, Optional<Long> accountId, Optional<Long> ownerId, Optional<Long> parentId, Optional<Long> groupId, Object tag,
                         Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) throws JSONException {
-        URI resourceUri = URI.create(ApplicationController.getApiUrl() + "users/" + String.valueOf(accountId.get()));
+        String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
+        URI resourceUri = URI.create(ApplicationController.getApiUrl() + "users/" + String.valueOf(accountId.get()) + "?accessToken=" + accessToken);
         List<Link> links = new ArrayList<Link>();
         List<Query> queries = new ArrayList<Query>();
 

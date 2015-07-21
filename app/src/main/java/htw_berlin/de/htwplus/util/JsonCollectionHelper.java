@@ -1,16 +1,14 @@
 package htw_berlin.de.htwplus.util;
 
-import com.fasterxml.jackson.databind.util.Converter;
+import net.hamnaberg.json.Collection;
+import net.hamnaberg.json.Data;
+import net.hamnaberg.json.Item;
+import net.hamnaberg.json.parser.CollectionParser;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-
-import net.hamnaberg.json.Collection;
-import net.hamnaberg.json.Data;
-import net.hamnaberg.json.Item;
-import net.hamnaberg.json.parser.CollectionParser;
 
 import htw_berlin.de.htwplus.datamodel.ApiError;
 import htw_berlin.de.htwplus.datamodel.Post;
@@ -58,7 +56,7 @@ public class JsonCollectionHelper {
             boolean hrefOk = (!item.getHref().isNone());
             boolean propertyOk = ((hasProperty("content", data)) && (hasProperty("parent_id", data))
                     && (hasProperty("group_id", data)) && (hasProperty("account_id", data))
-                    && (hasProperty("owner_id", data)));
+                    && (hasProperty("owner_id", data)) && (hasProperty("create_date", data)));
 
             if (hrefOk && propertyOk) {
                 URI resourceUri = item.getHref().get();
@@ -70,7 +68,8 @@ public class JsonCollectionHelper {
                 int groupId = data.propertyByName("group_id").get().hasValue() ? Integer.parseInt(data.propertyByName("group_id").get().getValue().get().asString()) : -1;
                 int accountId = data.propertyByName("account_id").get().hasValue() ? Integer.parseInt(data.propertyByName("account_id").get().getValue().get().asString()) : -1;
                 int ownerId = data.propertyByName("owner_id").get().hasValue() ? Integer.parseInt(data.propertyByName("owner_id").get().getValue().get().asString()) : -1;
-                posts.add(new Post(postId, content, accountId, ownerId, parentId, groupId));
+                String creationDate = data.propertyByName("create_date").get().hasValue() ? data.propertyByName("create_date").get().getValue().get().asString() : "";
+                posts.add(new Post(postId, content, accountId, ownerId, parentId, groupId, creationDate));
             }
         }
         return posts;

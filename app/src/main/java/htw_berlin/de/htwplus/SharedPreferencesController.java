@@ -3,11 +3,9 @@ package htw_berlin.de.htwplus;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.IllegalFormatCodePointException;
 
 /**
  * Created by tino on 20.07.15.
@@ -43,14 +41,15 @@ public class SharedPreferencesController {
     }
 
     private void setInitialPreferences() {
-        mSPEditor.putString("clientId", "b2f88822-c765-4c40-b8d8-60df634b745d");
-        //mSPEditor.putString("apiUrl", "http://10.0.2.2:9000/api/");
-        mSPEditor.putString("apiUrl", "http://192.168.0.212:9000/api/");
+        mSPEditor.putString("clientId", "4f3d4de8-518a-4f64-be38-b260030a0f5d");
+        mSPEditor.putString("apiUrl", "http://10.0.2.2:9000/api/");
+        //mSPEditor.putString("apiUrl", "http://192.168.0.212:9000/api/");
         mSPEditor.commit();
     }
 
     public boolean hasAccessToken() {
-        return (!mSharedPreferences.getString("accessToken", "").isEmpty());
+        return true;
+        //return (!mSharedPreferences.getString("accessToken", "").isEmpty());
     }
 
     public boolean hasAuthorizationToken() {
@@ -58,7 +57,8 @@ public class SharedPreferencesController {
     }
 
     public String getAccessToken() {
-        return mSharedPreferences.getString("accessToken", null);
+        return "19a6220c-9aa1-4aba-a476-3390c551c234";
+        //return mSharedPreferences.getString("accessToken", null);
     }
 
     public void setAccessToken(String token) {
@@ -70,8 +70,10 @@ public class SharedPreferencesController {
     }
 
     public void removeAccessToken() {
-        if (hasAccessToken())
+        if (hasAccessToken()) {
             mSPEditor.remove("accessToken");
+            mSPEditor.commit();
+        }
     }
 
     public String getAuthorizationToken() {

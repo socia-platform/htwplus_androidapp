@@ -55,8 +55,7 @@ public class PostAdapter extends ArrayAdapter<Post> {
                 userNameTextView.setText(userName);
             }
             if (createDateTimeTextView != null)
-                // Erstelldatum und -zeit werden (noch) nicht von der RestApi geliefert
-                createDateTimeTextView.setText("01.01.1999 22:22 Uhr");
+                createDateTimeTextView.setText(post.getCreationDate());
             if (postContentTextView != null)
                 postContentTextView.setText(post.getContent());
             if ((labelGroupNameTextView != null) && (groupNameTextView != null) &&
