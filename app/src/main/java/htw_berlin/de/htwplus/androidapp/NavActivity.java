@@ -1,4 +1,4 @@
-package htw_berlin.de.htwplus;
+package htw_berlin.de.htwplus.androidapp;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -8,8 +8,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-import htw_berlin.de.htwplus.view.PostListViewActivity;
-import htw_berlin.de.htwplus.view.UserListViewActivity;
+import htw_berlin.de.htwplus.androidapp.view.PostListViewActivity;
+import htw_berlin.de.htwplus.androidapp.view.UserListViewActivity;
 
 
 public class NavActivity extends Activity {

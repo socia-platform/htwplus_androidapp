@@ -1,4 +1,4 @@
-package htw_berlin.de.htwplus;
+package htw_berlin.de.htwplus.androidapp;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,8 +10,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import htw_berlin.de.htwplus.datamodel.Post;
-import htw_berlin.de.htwplus.datamodel.User;
+import htw_berlin.de.htwplus.androidapp.datamodel.Post;
+import htw_berlin.de.htwplus.androidapp.datamodel.User;
 
 /**
  * Created by tino on 14.07.15.

@@ -1,4 +1,4 @@
-package htw_berlin.de.htwplus.datamodel;
+package htw_berlin.de.htwplus.androidapp.datamodel;
 
 import net.hamnaberg.json.Item;
 import net.hamnaberg.json.Link;

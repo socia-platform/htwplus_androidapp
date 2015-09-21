@@ -1,4 +1,4 @@
-package htw_berlin.de.htwplus.util;
+package htw_berlin.de.htwplus.androidapp.util;
 
 import net.hamnaberg.json.Collection;
 import net.hamnaberg.json.Data;
@@ -10,9 +10,9 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import htw_berlin.de.htwplus.datamodel.ApiError;
-import htw_berlin.de.htwplus.datamodel.Post;
-import htw_berlin.de.htwplus.datamodel.User;
+import htw_berlin.de.htwplus.androidapp.datamodel.ApiError;
+import htw_berlin.de.htwplus.androidapp.datamodel.Post;
+import htw_berlin.de.htwplus.androidapp.datamodel.User;
 
 /**
  * Created by tino on 28.06.15.

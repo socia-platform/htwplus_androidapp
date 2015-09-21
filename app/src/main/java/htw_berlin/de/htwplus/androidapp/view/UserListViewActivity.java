@@ -1,4 +1,4 @@
-package htw_berlin.de.htwplus.view;
+package htw_berlin.de.htwplus.androidapp.view;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -19,11 +19,11 @@ import net.hamnaberg.json.Collection;
 import java.util.ArrayList;
 import java.util.List;
 
-import htw_berlin.de.htwplus.ApplicationController;
-import htw_berlin.de.htwplus.R;
-import htw_berlin.de.htwplus.datamodel.ApiError;
-import htw_berlin.de.htwplus.datamodel.User;
-import htw_berlin.de.htwplus.util.JsonCollectionHelper;
+import htw_berlin.de.htwplus.androidapp.ApplicationController;
+import htw_berlin.de.htwplus.androidapp.R;
+import htw_berlin.de.htwplus.androidapp.datamodel.ApiError;
+import htw_berlin.de.htwplus.androidapp.datamodel.User;
+import htw_berlin.de.htwplus.androidapp.util.JsonCollectionHelper;
 
 public class UserListViewActivity extends Activity implements Response.Listener, Response.ErrorListener {
 

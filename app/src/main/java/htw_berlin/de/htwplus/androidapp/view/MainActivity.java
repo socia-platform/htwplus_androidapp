@@ -1,4 +1,4 @@
-package htw_berlin.de.htwplus.view;
+package htw_berlin.de.htwplus.androidapp.view;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -23,12 +23,12 @@ import net.hamnaberg.json.Collection;
 
 import org.apache.http.impl.cookie.BasicClientCookie;
 
-import htw_berlin.de.htwplus.ApplicationController;
-import htw_berlin.de.htwplus.NavActivity;
-import htw_berlin.de.htwplus.R;
-import htw_berlin.de.htwplus.VolleyNetworkController;
-import htw_berlin.de.htwplus.datamodel.ApiError;
-import htw_berlin.de.htwplus.util.JsonCollectionHelper;
+import htw_berlin.de.htwplus.androidapp.ApplicationController;
+import htw_berlin.de.htwplus.androidapp.NavActivity;
+import htw_berlin.de.htwplus.androidapp.R;
+import htw_berlin.de.htwplus.androidapp.VolleyNetworkController;
+import htw_berlin.de.htwplus.androidapp.datamodel.ApiError;
+import htw_berlin.de.htwplus.androidapp.util.JsonCollectionHelper;
 
 
 public class MainActivity extends Activity implements Response.Listener, Response.ErrorListener, View.OnClickListener {

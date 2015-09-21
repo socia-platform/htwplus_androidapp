@@ -1,4 +1,4 @@
-package htw_berlin.de.htwplus.view;
+package htw_berlin.de.htwplus.androidapp.view;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -6,7 +6,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import htw_berlin.de.htwplus.R;
+import htw_berlin.de.htwplus.androidapp.R;
 
 public class ShowUserActivity extends Activity {
 

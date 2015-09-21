@@ -1,4 +1,4 @@
-package htw_berlin.de.htwplus;
+package htw_berlin.de.htwplus.androidapp;
 
 import android.content.Context;
 

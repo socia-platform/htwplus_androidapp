@@ -1,4 +1,4 @@
-package htw_berlin.de.htwplus.datamodel;
+package htw_berlin.de.htwplus.androidapp.datamodel;
 
 /**
  * Created by tino on 28.06.15.

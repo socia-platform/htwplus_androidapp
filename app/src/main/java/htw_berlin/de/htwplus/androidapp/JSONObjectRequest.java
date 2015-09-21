@@ -1,4 +1,4 @@
-package htw_berlin.de.htwplus;
+package htw_berlin.de.htwplus.androidapp;
 
 /**
  * Created by tim on 17.06.15.

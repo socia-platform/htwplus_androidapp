@@ -1,4 +1,4 @@
-package htw_berlin.de.htwplus;
+package htw_berlin.de.androidapp;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

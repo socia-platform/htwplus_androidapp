@@ -1,4 +1,4 @@
-package htw_berlin.de.htwplus;
+package htw_berlin.de.htwplus.androidapp;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Response;

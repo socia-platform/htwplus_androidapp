@@ -1,10 +1,7 @@
-package htw_berlin.de.htwplus;
+package htw_berlin.de.htwplus.androidapp;
 
 import android.app.Application;
-import android.content.SharedPreferences;
-import android.widget.Toast;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
