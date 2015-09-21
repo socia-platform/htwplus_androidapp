@@ -10,38 +10,30 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/request"
-        android:id="@+id/mButton"
+        android:text="Posts"
+        android:id="@+id/PostBtn"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:id="@+id/mTextView"
-        android:layout_below="@+id/mButton"
+        android:layout_marginTop="77dp"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="74dp"
         android:layout_alignParentEnd="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Post"
-        android:id="@+id/mButtonPost"
-        android:layout_below="@+id/mTextView"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="147dp" />
+        android:text="Friends"
+        android:id="@+id/FriendsBtn"
+        android:layout_below="@+id/PostBtn"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="47dp"
+        android:layout_alignEnd="@+id/PostBtn" />
 
-    <EditText
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:text="Message from android app"
-        android:ems="10"
-        android:id="@+id/mEditText"
-        android:layout_marginTop="26dp"
-        android:layout_below="@+id/mButtonPost"
-        android:layout_centerHorizontal="true" />
+        android:text="Groups"
+        android:id="@+id/GroupsBtn"
+        android:layout_below="@+id/FriendsBtn"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="54dp"
+        android:layout_alignEnd="@+id/FriendsBtn" />
 </RelativeLayout>

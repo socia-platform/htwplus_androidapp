@@ -7,24 +7,17 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
 import net.hamnaberg.json.Collection;
 
-import org.apache.http.impl.cookie.BasicClientCookie;
-
 import htw_berlin.de.htwplus.androidapp.ApplicationController;
-import htw_berlin.de.htwplus.androidapp.NavActivity;
 import htw_berlin.de.htwplus.androidapp.R;
 import htw_berlin.de.htwplus.androidapp.VolleyNetworkController;
 import htw_berlin.de.htwplus.androidapp.datamodel.ApiError;
@@ -34,34 +27,50 @@ import htw_berlin.de.htwplus.androidapp.util.JsonCollectionHelper;
 public class MainActivity extends Activity implements Response.Listener, Response.ErrorListener, View.OnClickListener {
     public static final String REQUEST_TAG = "MainVolleyActivity";
     private TextView mTextView;
-    private Button mButton;
-    private Button mButtonPost;
-    private EditText mEditText;
     private Dialog mAuthDialog;
+    private Button postsBtn;
+    private Button groupsBtn;
+    private Button friendsBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mTextView = (TextView) findViewById(R.id.mTextView);
-        mButton = (Button) findViewById(R.id.mButton);
-        mButtonPost = (Button) findViewById(R.id.mButtonPost);
-        mButton.setOnClickListener(this);
-        mButtonPost.setOnClickListener(this);
-        mEditText = (EditText) findViewById(R.id.mEditText);
+        postsBtn = (Button) findViewById(R.id.PostBtn);
+        groupsBtn = (Button) findViewById(R.id.GroupsBtn);
+        friendsBtn = (Button) findViewById(R.id.FriendsBtn);
+
+        postsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), PostListViewActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        /*
+        groupsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), Grou.class);
+                startActivity(intent);
+            }
+        });*/
+
+        friendsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), UserListViewActivity.class);
+                startActivity(intent);
+            }
+        });
 
         mAuthDialog = new Dialog(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen);
         mAuthDialog.setContentView(R.layout.oauth2_dialog);
 
-        //ApplicationController.getSharedPrefController().removeAccessToken();
-        if (!ApplicationController.getSharedPrefController().hasAccessToken()) {
+        ApplicationController.getSharedPrefController().removeAccessToken();
+        if (!ApplicationController.getSharedPrefController().hasAccessToken())
             makeAuthentification();
-            Intent intent = new Intent(getApplicationContext(), NavActivity.class);
-            startActivity(intent);
-        } else {
-            Intent intent = new Intent(getApplicationContext(), NavActivity.class);
-            startActivity(intent);
-        }
     }
 
     @Override
@@ -128,7 +137,6 @@ public class MainActivity extends Activity implements Response.Listener, Respons
     private void makeAuthentification() {
         WebView webView = (WebView)mAuthDialog.findViewById(R.id.webv);
         webView.getSettings().setJavaScriptEnabled(true);
-        System.out.println(ApplicationController.getSharedPrefController().getAuthorizationUrl().toString());
         webView.loadUrl(ApplicationController.getSharedPrefController().getAuthorizationUrl().toString());
         webView.setWebViewClient(new WebViewClient() {
 
@@ -147,20 +155,9 @@ public class MainActivity extends Activity implements Response.Listener, Respons
                     Uri uri = Uri.parse(url);
                     String authCode = uri.getQueryParameter("authorizationCode");
                     ApplicationController.getSharedPrefController().setAuthorizationToken(authCode);
-
-
                     makeAccessTokenRequest();
-                    Toast.makeText(getApplicationContext(), "Authorization Code is: " + authCode, Toast.LENGTH_SHORT).show();
                     authComplete = true;
                     ApplicationController.getSharedPrefController().removeAuthorizationToken();
-                    mAuthDialog.dismiss();
-                } else if (url.contains("clientId=")) {
-                    BasicClientCookie sessionCookie = extractSessionCookie(CookieManager.getInstance().getCookie(url));
-                    ApplicationController.getSharedPrefController().setPlaySessionValue(sessionCookie.getValue());
-                } else if (url.contains("error=access_denied")) {
-                    authComplete = true;
-                    //setResult(Activity.RESULT_CANCELED, resultIntent);
-                    Toast.makeText(getApplicationContext(), "Error Occured", Toast.LENGTH_SHORT).show();
                     mAuthDialog.dismiss();
                 }
             }
@@ -170,39 +167,7 @@ public class MainActivity extends Activity implements Response.Listener, Respons
     }
 
     public void makeAccessTokenRequest() {
-        syncCookie("PLAY_SESSION",
-                ApplicationController.getSharedPrefController().getApiUrl().getHost(),
-                ApplicationController.getSharedPrefController().getPlaySessionValue());
         String authToken = ApplicationController.getSharedPrefController().getAuthorizationToken();
         ApplicationController.getVolleyController().getAccessToken(authToken, "AccessTokenRequest", this, this);
-    }
-
-    private void syncCookie(String name, String domain, String value) {
-        CookieSyncManager.createInstance(this);
-        CookieManager cookieManager = CookieManager.getInstance();
-        cookieManager.removeSessionCookie();
-        String cookieString = name + "=\"" + value + "; domain=" + domain + "\"";
-        cookieManager.setCookie(domain, cookieString);
-        CookieSyncManager.getInstance().sync();
-    }
-
-    private BasicClientCookie extractSessionCookie(String rawCookiesString) {
-        BasicClientCookie sessionCookie = null;
-        String[] rawCookies = rawCookiesString.split(";");
-        String rawSessionCookie = null;
-        for (String rawCookie : rawCookies) {
-            if (rawCookie.contains("PLAY_SESSION=")) {
-                rawSessionCookie = rawCookie;
-                break;
-            }
-        }
-        String[] rawCookieNameAndValue = rawSessionCookie.split("\"");
-        if (rawCookieNameAndValue.length == 2) {
-            rawCookieNameAndValue[0] = rawCookieNameAndValue[0].substring(0, rawCookieNameAndValue[0].indexOf("="));
-            String cookieName = rawCookieNameAndValue[0].trim();
-            String cookieValue = rawCookieNameAndValue[1].trim();
-            sessionCookie = new BasicClientCookie(cookieName, cookieValue);
-        }
-        return sessionCookie;
     }
 }

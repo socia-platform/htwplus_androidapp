@@ -41,15 +41,15 @@ public class SharedPreferencesController {
     }
 
     private void setInitialPreferences() {
-        mSPEditor.putString("clientId", "4f3d4de8-518a-4f64-be38-b260030a0f5d");
-        mSPEditor.putString("apiUrl", "http://10.0.2.2:9000/api/");
-        //mSPEditor.putString("apiUrl", "http://192.168.0.212:9000/api/");
+        mSPEditor.putString("clientId", "b2f88822-c765-4c40-b8d8-60df634b745d");
+        //mSPEditor.putString("apiUrl", "http://10.0.2.2:9000/api/");
+        mSPEditor.putString("apiUrl", "http://192.168.0.212:9000/api/");
+        mSPEditor.putLong("currentUserId", 49l);
         mSPEditor.commit();
     }
 
     public boolean hasAccessToken() {
-        return true;
-        //return (!mSharedPreferences.getString("accessToken", "").isEmpty());
+        return (!mSharedPreferences.getString("accessToken", "").isEmpty());
     }
 
     public boolean hasAuthorizationToken() {
@@ -57,8 +57,7 @@ public class SharedPreferencesController {
     }
 
     public String getAccessToken() {
-        return "19a6220c-9aa1-4aba-a476-3390c551c234";
-        //return mSharedPreferences.getString("accessToken", null);
+        return mSharedPreferences.getString("accessToken", null);
     }
 
     public void setAccessToken(String token) {
@@ -89,8 +88,10 @@ public class SharedPreferencesController {
     }
 
     public void removeAuthorizationToken() {
-        if (hasAuthorizationToken())
+        if (hasAuthorizationToken()) {
             mSPEditor.remove("authorizationToken");
+            mSPEditor.commit();
+        }
     }
 
     public String getClientId() {
@@ -130,5 +131,24 @@ public class SharedPreferencesController {
             mSPEditor.commit();
         } else
             throw new IllegalArgumentException("PlaySessionValue must be a valid String.");
+    }
+
+    public void setCurrentUserId(long userId) {
+        if (userId > -1) {
+            mSPEditor.putLong("currentUserId", userId);
+            mSPEditor.commit();
+        } else
+            throw new IllegalArgumentException("PlaySessionValue must be a valid String.");
+    }
+
+    public long getCurrentUserId() {
+        return mSharedPreferences.getLong("currentUserId", -1);
+    }
+
+    public void removeCurrentUserId() {
+        if (hasAuthorizationToken()) {
+            mSPEditor.remove("currentUserId");
+            mSPEditor.commit();
+        }
     }
 }
