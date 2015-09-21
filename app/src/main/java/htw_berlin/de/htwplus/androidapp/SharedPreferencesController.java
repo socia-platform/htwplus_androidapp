@@ -41,9 +41,9 @@ public class SharedPreferencesController {
     }
 
     private void setInitialPreferences() {
-        mSPEditor.putString("clientId", "b2f88822-c765-4c40-b8d8-60df634b745d");
+        //mSPEditor.putString("clientId", "b2f88822-c765-4c40-b8d8-60df634b745d");
         //mSPEditor.putString("apiUrl", "http://10.0.2.2:9000/api/");
-        mSPEditor.putString("apiUrl", "http://192.168.0.212:9000/api/");
+        //mSPEditor.putString("apiUrl", "http://192.168.0.212:9000/api/");
         mSPEditor.putLong("currentUserId", 49l);
         mSPEditor.commit();
     }
@@ -98,6 +98,10 @@ public class SharedPreferencesController {
         return mSharedPreferences.getString("clientId", null);
     }
 
+    public boolean hasApiUrl() {
+        return (!mSharedPreferences.getString("apiUrl", "").isEmpty());
+    }
+
     public URL getApiUrl() {
         URL apiUrl = null;
         try {
@@ -106,6 +110,22 @@ public class SharedPreferencesController {
             Log.d("SharedPrefController", "Exception Occured: ", muex);
         }
         return apiUrl;
+    }
+
+    public URL setApiUrl(URL apiUrl) {
+        if (apiUrl != null) {
+            mSPEditor.putString("apiUrl", apiUrl.toString());
+            mSPEditor.commit();
+        } else
+            throw new IllegalArgumentException("Api url may not be null.");
+        return apiUrl;
+    }
+
+    public void removeApiUrl() {
+        if (hasApiUrl()) {
+            mSPEditor.remove("apiUrl");
+            mSPEditor.commit();
+        }
     }
 
     public URL getAuthorizationUrl() {

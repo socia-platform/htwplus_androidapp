@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:windowBackground="@null"
+    android:windowNoTitle="true"
+    android:windowIsFloating="false">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Grundkonfiguration"
+        android:id="@+id/titleTextView"
+        android:layout_marginTop="40dp"
+        android:textSize="20sp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/apiUrlEditText"
+        android:layout_marginTop="90dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp"
+        android:hint="https://htwplus.de/api"
+        android:layout_alignTop="@+id/titleTextView" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Bitte Api-URL eingeben:"
+        android:id="@+id/apiUrlLabelTextView"
+        android:layout_alignBottom="@+id/apiUrlEditText"
+        android:layout_alignStart="@+id/apiUrlEditText"
+        android:layout_marginBottom="55dp" />
+
+</RelativeLayout>

@@ -1,21 +1,28 @@
 package htw_berlin.de.htwplus.androidapp.view;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
 import net.hamnaberg.json.Collection;
+
+import java.net.URL;
 
 import htw_berlin.de.htwplus.androidapp.ApplicationController;
 import htw_berlin.de.htwplus.androidapp.R;
@@ -69,8 +76,12 @@ public class MainActivity extends Activity implements Response.Listener, Respons
         mAuthDialog.setContentView(R.layout.oauth2_dialog);
 
         ApplicationController.getSharedPrefController().removeAccessToken();
-        if (!ApplicationController.getSharedPrefController().hasAccessToken())
-            makeAuthentification();
+        ApplicationController.getSharedPrefController().removeApiUrl();
+        if (!ApplicationController.getSharedPrefController().hasAccessToken()) {
+            if(ApplicationController.getSharedPrefController().getApiUrl() == null)
+                showApiBasicSettingsAlertDialog();
+            //makeAuthentification();
+        }
     }
 
     @Override
@@ -139,7 +150,6 @@ public class MainActivity extends Activity implements Response.Listener, Respons
         webView.getSettings().setJavaScriptEnabled(true);
         webView.loadUrl(ApplicationController.getSharedPrefController().getAuthorizationUrl().toString());
         webView.setWebViewClient(new WebViewClient() {
-
             boolean authComplete = false;
 
             @Override
@@ -169,5 +179,42 @@ public class MainActivity extends Activity implements Response.Listener, Respons
     public void makeAccessTokenRequest() {
         String authToken = ApplicationController.getSharedPrefController().getAuthorizationToken();
         ApplicationController.getVolleyController().getAccessToken(authToken, "AccessTokenRequest", this, this);
+    }
+
+    private void showApiBasicSettingsAlertDialog() {
+        LayoutInflater factory = LayoutInflater.from(this);
+        final View view = factory.inflate(R.layout.basic_settings_alert_dialog, null);
+        final EditText apiUrlEditText = (EditText) view.findViewById(R.id.apiUrlEditText);
+        final AlertDialog builder = new AlertDialog.Builder(this)
+                .setView(view)
+                .setPositiveButton("OK", null) //Button Set to null. We override the onclick
+                .create();
+        builder.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                Button positiveButton = builder.getButton(AlertDialog.BUTTON_POSITIVE);
+                positiveButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        try {
+                            URL apiUrl = new URL(apiUrlEditText.getText().toString());
+                            Runtime runtime = Runtime.getRuntime();
+                            Process proc = runtime.exec("ping -c 1 " + apiUrl.getHost());
+                            int mPingResult = proc.waitFor();
+                            if(mPingResult == 0) {
+                                ApplicationController.getSharedPrefController().setApiUrl(apiUrl);
+                                String message = "\"" + apiUrl.toString() + "\" gespeichert";
+                                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                                builder.cancel();
+                            } else
+                                Toast.makeText(getApplicationContext(), "Der Host ist nicht erreichbar", Toast.LENGTH_LONG).show();
+                        } catch (Exception ex) {
+                            Toast.makeText(getApplicationContext(), "Diese URL ist ungültig", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+            }
+        });
+        builder.show();
     }
 }
