@@ -15,4 +15,7 @@
     <string name="title_activity_post_list_view">PostListViewActivity</string>
     <string name="title_activity_show_post">ShowPostActivity</string>
     <string name="title_activity_nav">Navigation</string>
+    <string name="label_enter_api_url">HTWPlus API-URL:</string>
+    <string name="label_enter_username">Benutzername:</string>
+    <string name="edittext_hint_enter_api_url">https://htwplus.de/api</string>
 </resources>

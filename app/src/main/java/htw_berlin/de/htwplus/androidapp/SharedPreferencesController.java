@@ -41,9 +41,7 @@ public class SharedPreferencesController {
     }
 
     private void setInitialPreferences() {
-        //mSPEditor.putString("clientId", "b2f88822-c765-4c40-b8d8-60df634b745d");
-        //mSPEditor.putString("apiUrl", "http://10.0.2.2:9000/api/");
-        //mSPEditor.putString("apiUrl", "http://192.168.0.212:9000/api/");
+        mSPEditor.putString("clientId", "b2f88822-c765-4c40-b8d8-60df634b745d");
         mSPEditor.putLong("currentUserId", 49l);
         mSPEditor.commit();
     }
@@ -114,7 +112,10 @@ public class SharedPreferencesController {
 
     public URL setApiUrl(URL apiUrl) {
         if (apiUrl != null) {
-            mSPEditor.putString("apiUrl", apiUrl.toString());
+            String apiUrlString = apiUrl.toString();
+            if (!apiUrlString.endsWith("/"))
+                apiUrlString += "/";
+            mSPEditor.putString("apiUrl", apiUrlString);
             mSPEditor.commit();
         } else
             throw new IllegalArgumentException("Api url may not be null.");

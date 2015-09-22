@@ -3,11 +3,15 @@ package htw_berlin.de.htwplus.androidapp.view;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.WebView;
@@ -29,9 +33,12 @@ import htw_berlin.de.htwplus.androidapp.R;
 import htw_berlin.de.htwplus.androidapp.VolleyNetworkController;
 import htw_berlin.de.htwplus.androidapp.datamodel.ApiError;
 import htw_berlin.de.htwplus.androidapp.util.JsonCollectionHelper;
+import htw_berlin.de.htwplus.androidapp.view.dialog.ConfigurationDialogFragment;
 
 
-public class MainActivity extends Activity implements Response.Listener, Response.ErrorListener, View.OnClickListener {
+public class MainActivity extends FragmentActivity
+        implements Response.Listener, Response.ErrorListener,
+                   View.OnClickListener, ConfigurationDialogFragment.ConfigurationDialogListener {
     public static final String REQUEST_TAG = "MainVolleyActivity";
     private TextView mTextView;
     private Dialog mAuthDialog;
@@ -77,11 +84,10 @@ public class MainActivity extends Activity implements Response.Listener, Respons
 
         ApplicationController.getSharedPrefController().removeAccessToken();
         ApplicationController.getSharedPrefController().removeApiUrl();
-        if (!ApplicationController.getSharedPrefController().hasAccessToken()) {
-            if(ApplicationController.getSharedPrefController().getApiUrl() == null)
-                showApiBasicSettingsAlertDialog();
-            //makeAuthentification();
-        }
+        if(ApplicationController.getSharedPrefController().getApiUrl() == null)
+            enterConfigurations();
+        else if (!ApplicationController.getSharedPrefController().hasAccessToken())
+            makeAuthentification();
     }
 
     @Override
@@ -145,6 +151,14 @@ public class MainActivity extends Activity implements Response.Listener, Respons
         }
     }
 
+    @Override
+    public void onConfigurationDialogPositiveClick(DialogFragment dialog, URL apiUrl) {
+        ApplicationController.getSharedPrefController().setApiUrl(apiUrl);
+        Toast.makeText(this, R.string.api_url_saved, Toast.LENGTH_LONG).show();
+        if (!ApplicationController.getSharedPrefController().hasAccessToken())
+            makeAuthentification();
+    }
+
     private void makeAuthentification() {
         WebView webView = (WebView)mAuthDialog.findViewById(R.id.webv);
         webView.getSettings().setJavaScriptEnabled(true);
@@ -181,40 +195,8 @@ public class MainActivity extends Activity implements Response.Listener, Respons
         ApplicationController.getVolleyController().getAccessToken(authToken, "AccessTokenRequest", this, this);
     }
 
-    private void showApiBasicSettingsAlertDialog() {
-        LayoutInflater factory = LayoutInflater.from(this);
-        final View view = factory.inflate(R.layout.basic_settings_alert_dialog, null);
-        final EditText apiUrlEditText = (EditText) view.findViewById(R.id.apiUrlEditText);
-        final AlertDialog builder = new AlertDialog.Builder(this)
-                .setView(view)
-                .setPositiveButton("OK", null) //Button Set to null. We override the onclick
-                .create();
-        builder.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialog) {
-                Button positiveButton = builder.getButton(AlertDialog.BUTTON_POSITIVE);
-                positiveButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        try {
-                            URL apiUrl = new URL(apiUrlEditText.getText().toString());
-                            Runtime runtime = Runtime.getRuntime();
-                            Process proc = runtime.exec("ping -c 1 " + apiUrl.getHost());
-                            int mPingResult = proc.waitFor();
-                            if(mPingResult == 0) {
-                                ApplicationController.getSharedPrefController().setApiUrl(apiUrl);
-                                String message = "\"" + apiUrl.toString() + "\" gespeichert";
-                                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-                                builder.cancel();
-                            } else
-                                Toast.makeText(getApplicationContext(), "Der Host ist nicht erreichbar", Toast.LENGTH_LONG).show();
-                        } catch (Exception ex) {
-                            Toast.makeText(getApplicationContext(), "Diese URL ist ungültig", Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-            }
-        });
-        builder.show();
+    private void enterConfigurations() {
+        DialogFragment confFragmentDialog = new ConfigurationDialogFragment();
+        confFragmentDialog.show(getFragmentManager(), "configuration");
     }
 }
