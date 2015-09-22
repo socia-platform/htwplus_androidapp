@@ -25,7 +25,6 @@ public class ApplicationController extends Application {
     private static VolleyNetworkController vncInstance;
     private static SharedPreferencesController spcInstance;
 
-    // "Konstruktor"
     @Override
     public void onCreate() {
         super.onCreate();
@@ -50,6 +49,12 @@ public class ApplicationController extends Application {
 
     public static SharedPreferencesController getSharedPrefController() {
         return spcInstance;
+    }
+
+    public boolean isWorkingState() {
+        boolean isWorking = (getSharedPrefController().hasApiUrl() &&
+                             getSharedPrefController().hasAccessToken());
+        return isWorking;
     }
 
 }

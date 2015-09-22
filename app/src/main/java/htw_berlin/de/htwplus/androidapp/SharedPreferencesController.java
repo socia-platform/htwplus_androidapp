@@ -42,6 +42,8 @@ public class SharedPreferencesController {
 
     private void setInitialPreferences() {
         mSPEditor.putString("clientId", "b2f88822-c765-4c40-b8d8-60df634b745d");
+        mSPEditor.putString("clientSecret", "fe538d15-46b1-412b-812d-9838f483aec3");
+        mSPEditor.putString("authCallBackURI", "https://localhost/androidclient");
         mSPEditor.putLong("currentUserId", 49l);
         mSPEditor.commit();
     }
@@ -96,6 +98,14 @@ public class SharedPreferencesController {
         return mSharedPreferences.getString("clientId", null);
     }
 
+    public String getClientSecret() {
+        return mSharedPreferences.getString("clientSecret", null);
+    }
+
+    public String getAuthCallBackURI() {
+        return mSharedPreferences.getString("authCallBackURI", null);
+    }
+
     public boolean hasApiUrl() {
         return (!mSharedPreferences.getString("apiUrl", "").isEmpty());
     }
@@ -134,7 +144,10 @@ public class SharedPreferencesController {
         if (!mSharedPreferences.getString("apiUrl", "").isEmpty() &&
                 !mSharedPreferences.getString("clientId", "").isEmpty()) {
             try {
-                authUrl = new URL(getApiUrl().toString() + "oauth2/authorize?clientId=" + getClientId());
+                String addition = "oauth2/authorize?client_id=" + getClientId();
+                addition += "&client_secret=" + getClientSecret();
+                addition += "&response_type=code&redirect_uri=" + getAuthCallBackURI();
+                authUrl = new URL(getApiUrl().toString() + addition);
             } catch (MalformedURLException muex) {
                 Log.d("SharedPrefController", "Exception Occured: ", muex);
             }

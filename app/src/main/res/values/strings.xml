@@ -15,7 +15,19 @@
     <string name="title_activity_post_list_view">PostListViewActivity</string>
     <string name="title_activity_show_post">ShowPostActivity</string>
     <string name="title_activity_nav">Navigation</string>
-    <string name="label_enter_api_url">HTWPlus API-URL:</string>
+    <string name="configuration_info_api_url_positive">HTWPlus API-URL:</string>
+    <string name="configuration_info_api_url_negative">Keine HTWPlus API-URL vorhanden!</string>
     <string name="label_enter_username">Benutzername:</string>
     <string name="edittext_hint_enter_api_url">https://htwplus.de/api</string>
+    <string name="main_post_button">Posts</string>
+    <string name="main_contacts_button">Kontakte</string>
+    <string name="main_groups_button">Gruppen</string>
+    <string name="warning_no_access">Keine gültigen Logindaten vorhanden</string>
+    <string name="warning_no_api_url">Keine gültigen Verbindungsdaten gefunden</string>
+    <string name="click_info_open_configuration">Konfiguration öffnen</string>
+    <string name="configuration_info_access_token_positive">Access-Token:</string>
+    <string name="configuration_info_access_token_negative">Kein Access-Token vorhanden!</string>
+    <string name="configuration_info_details_access_token">Melde dich an um dich mit HTWPlus verbinden zu können.</string>
+    <string name="configuration_open_auth_dialog_button">Anmelden</string>
+    <string name="configuration_open_auth_dialog_button_refresh">Refresh</string>
 </resources>

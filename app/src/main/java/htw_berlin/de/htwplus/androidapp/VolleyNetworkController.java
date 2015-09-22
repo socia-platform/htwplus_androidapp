@@ -10,6 +10,7 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import net.hamnaberg.funclite.Optional;
@@ -67,11 +68,14 @@ public class VolleyNetworkController {
         mRequestQueue.cancelAll(tag);
     }
 
-    public void getAccessToken(String authToken, Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
-        String url = ApplicationController.getApiUrl().toString() + "oauth2/token?authorizationCode=" + authToken;
-        final CustomJsonObjectRequest jsonRequest = new CustomJsonObjectRequest(Request.Method.GET, url, new JSONObject(), responseListener, errorListener);
-        jsonRequest.setTag(tag);
-        mRequestQueue.add(jsonRequest);
+    public void getAccessToken(String authToken, Object tag, Response.Listener<String> responseListener, Response.ErrorListener errorListener) {
+        SharedPreferencesController shCon = ApplicationController.getSharedPrefController();
+        String url = shCon.getApiUrl().toString() + "oauth2/authorize?client_id=" + shCon.getClientId();
+        url += "&grant_type=authorization_code&code=" + authToken + "&state=1279179";
+        //final CustomJsonObjectRequest jsonRequest = new CustomJsonObjectRequest(Request.Method.GET, url, new JSONObject(), responseListener, errorListener);
+        //jsonRequest.setTag(tag);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, responseListener, errorListener);
+        mRequestQueue.add(stringRequest);
     }
 
     public void getUser(long userId, Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {

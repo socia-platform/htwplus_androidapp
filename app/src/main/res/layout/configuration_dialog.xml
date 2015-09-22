@@ -20,7 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/label_enter_api_url"
+        android:text="@string/configuration_info_api_url_negative"
         android:id="@+id/apiUrlLabelTextView"
         android:layout_alignBottom="@+id/apiUrlEditText"
         android:layout_alignStart="@+id/apiUrlEditText"
@@ -29,12 +29,46 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/positive_button"
+        android:text="@string/configuration_api_url_button"
         android:id="@+id/confirmButton"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="27dp"
         android:layout_marginLeft="20dp"
+        android:layout_marginRight="100dp"
+        android:layout_below="@+id/apiUrlEditText"
+        android:layout_marginTop="10dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/configuration_info_access_token_negative"
+        android:id="@+id/accessTokenInfoTextView"
+        android:layout_centerVertical="true"
+        android:layout_alignStart="@+id/confirmButton"
+        android:layout_below="@+id/confirmButton"
+        android:layout_marginTop="45dp"
         android:layout_marginRight="20dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/configuration_info_details_access_token"
+        android:id="@+id/accessTokenInfoDetailsTextView"
+        android:layout_below="@+id/accessTokenInfoTextView"
+        android:layout_alignStart="@+id/accessTokenInfoTextView"
+        android:layout_alignEnd="@+id/apiUrlEditText"
+        android:layout_marginTop="10dp" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/configuration_open_auth_dialog_button"
+        android:id="@+id/openAuthViewButton"
+        android:layout_below="@+id/accessTokenInfoDetailsTextView"
+        android:layout_marginTop="30dp"
+        android:layout_alignParentStart="false"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="100dp"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>
