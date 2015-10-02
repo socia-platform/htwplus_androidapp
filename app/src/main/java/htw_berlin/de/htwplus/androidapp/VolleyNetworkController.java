@@ -70,11 +70,14 @@ public class VolleyNetworkController {
 
     public void getAccessToken(String authToken, Object tag, Response.Listener<String> responseListener, Response.ErrorListener errorListener) {
         SharedPreferencesController shCon = ApplicationController.getSharedPrefController();
-        String url = shCon.getApiUrl().toString() + "oauth2/authorize?client_id=" + shCon.getClientId();
-        url += "&grant_type=authorization_code&code=" + authToken + "&state=1279179";
+        String url = shCon.getApiUrl().toString();
+        url += "oauth2/token?client_id=" + shCon.getClientId();
+        url += "&grant_type=authorization_code&code=" + authToken;
+        url += "&client_secret=" + shCon.getClientSecret();
         //final CustomJsonObjectRequest jsonRequest = new CustomJsonObjectRequest(Request.Method.GET, url, new JSONObject(), responseListener, errorListener);
         //jsonRequest.setTag(tag);
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, responseListener, errorListener);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, responseListener,
+                errorListener);
         mRequestQueue.add(stringRequest);
     }
 

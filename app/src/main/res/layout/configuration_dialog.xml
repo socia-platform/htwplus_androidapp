@@ -30,7 +30,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/configuration_api_url_button"
-        android:id="@+id/confirmButton"
+        android:id="@+id/fetchApiUrlButton"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="100dp"
         android:layout_below="@+id/apiUrlEditText"
@@ -43,8 +43,8 @@
         android:text="@string/configuration_info_access_token_negative"
         android:id="@+id/accessTokenInfoTextView"
         android:layout_centerVertical="true"
-        android:layout_alignStart="@+id/confirmButton"
-        android:layout_below="@+id/confirmButton"
+        android:layout_alignStart="@+id/fetchApiUrlButton"
+        android:layout_below="@+id/fetchApiUrlButton"
         android:layout_marginTop="45dp"
         android:layout_marginRight="20dp" />
 

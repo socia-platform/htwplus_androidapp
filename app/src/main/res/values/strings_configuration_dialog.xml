@@ -5,4 +5,5 @@
     <string name="api_url_saved">API-URL gespeichert</string>
     <string name="error_api_url_invalid">Diese URL ist ungültig</string>
     <string name="error_host_unreachable">Der Host ist nicht erreichbar</string>
+    <string name="error_unexpected_response">Unerwartete Serverantwort</string>
 </resources>
