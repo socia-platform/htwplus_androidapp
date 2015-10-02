@@ -74,8 +74,6 @@ public class VolleyNetworkController {
         url += "oauth2/token?client_id=" + shCon.getClientId();
         url += "&grant_type=authorization_code&code=" + authToken;
         url += "&client_secret=" + shCon.getClientSecret();
-        //final CustomJsonObjectRequest jsonRequest = new CustomJsonObjectRequest(Request.Method.GET, url, new JSONObject(), responseListener, errorListener);
-        //jsonRequest.setTag(tag);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url, responseListener,
                 errorListener);
         mRequestQueue.add(stringRequest);

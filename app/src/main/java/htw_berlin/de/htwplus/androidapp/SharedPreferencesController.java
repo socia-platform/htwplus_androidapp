@@ -6,6 +6,7 @@ import android.util.Log;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
 
 /**
  * Created by tino on 20.07.15.
@@ -93,6 +94,57 @@ public class SharedPreferencesController {
             mSPEditor.commit();
         }
     }
+
+    public boolean hasRefreshToken() {
+        return (!mSharedPreferences.getString("refreshToken", "").isEmpty());
+    }
+
+    public String getRefreshToken() {
+        return mSharedPreferences.getString("refreshToken", null);
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        if (!refreshToken.isEmpty()) {
+            mSPEditor.putString("refreshToken", refreshToken);
+            mSPEditor.commit();
+        } else
+            throw new IllegalArgumentException("Refresh token must be a valid String.");
+    }
+
+    public void removeRefreshToken() {
+        if (hasRefreshToken()) {
+            mSPEditor.remove("refreshToken");
+            mSPEditor.commit();
+        }
+    }
+
+    public boolean hasExpiredTimeAccessToken() {
+        return (mSharedPreferences.getInt("expiredTimeAccessToken", -1) != -1);
+    }
+
+    public Date getExpiredTimeAccessToken() {
+        Date expiredDate = null;
+        int expSeconds = mSharedPreferences.getInt("expiredTimeAccessToken", -1);
+        if (expSeconds != -1)
+            expiredDate = new Date(System.currentTimeMillis() + (expSeconds * 1000));
+        return expiredDate;
+    }
+
+    public void setExpiredTimeAccessToken(int second) {
+        if (second > 0) {
+            mSPEditor.putInt("expiredTimeAccessToken", second);
+            mSPEditor.commit();
+        } else
+            throw new IllegalArgumentException("Second must be greater than 0.");
+    }
+
+    public void removeExpiredTimeAccessToken() {
+        if (hasRefreshToken()) {
+            mSPEditor.remove("expiredTimeAccessToken");
+            mSPEditor.commit();
+        }
+    }
+
 
     public String getClientId() {
         return mSharedPreferences.getString("clientId", null);

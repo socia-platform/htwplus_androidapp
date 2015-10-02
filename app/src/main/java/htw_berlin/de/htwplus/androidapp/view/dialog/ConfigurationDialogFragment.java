@@ -22,6 +22,7 @@ import com.android.volley.VolleyError;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 
 import htw_berlin.de.htwplus.androidapp.ApplicationController;
 import htw_berlin.de.htwplus.androidapp.R;
@@ -116,7 +117,13 @@ public class ConfigurationDialogFragment extends DialogFragment
         try {
             JSONObject jsonResponse = new JSONObject((String)response);
             String accessToken = jsonResponse.getString("access_token");
+            String refreshToken = jsonResponse.getString("refresh_token");
+            int expiredSeconds = jsonResponse.getInt("expires_in");
             if (!accessToken.isEmpty()) {
+                if (!refreshToken.isEmpty())
+                    ApplicationController.getSharedPrefController().setRefreshToken(refreshToken);
+                if (expiredSeconds > 0)
+                    ApplicationController.getSharedPrefController().setExpiredTimeAccessToken(expiredSeconds);
                 ApplicationController.getSharedPrefController().setAccessToken(accessToken);
                 fillStateInformations();
             }
@@ -190,7 +197,13 @@ public class ConfigurationDialogFragment extends DialogFragment
         }
         if (shCon.hasAccessToken()) {
             mAccessTokenInfoTextView.setText(getText(R.string.configuration_info_access_token_positive));
-            mAccessTokenInfoDetailsTextView.setText(shCon.getAccessToken());
+            String details = shCon.getAccessToken();
+            if (shCon.hasExpiredTimeAccessToken()) {
+                details += "\n" + getText(R.string.access_token_expired_in) + ": ";
+                details += new SimpleDateFormat("dd.MM.yyyy HH:mm").format(shCon
+                        .getExpiredTimeAccessToken());
+            }
+            mAccessTokenInfoDetailsTextView.setText(details);
             mOpenAuthViewButton.setText(getText(R.string.configuration_open_auth_dialog_button_refresh));
         } else {
             mAccessTokenInfoTextView.setText(getText(R.string.configuration_info_access_token_negative));
