@@ -1,15 +1,28 @@
 package htw_berlin.de.htwplus.androidapp.util;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+
+import net.hamnaberg.funclite.Optional;
 import net.hamnaberg.json.Collection;
 import net.hamnaberg.json.Data;
 import net.hamnaberg.json.Item;
+import net.hamnaberg.json.Link;
+import net.hamnaberg.json.Property;
+import net.hamnaberg.json.Query;
+import net.hamnaberg.json.Template;
 import net.hamnaberg.json.parser.CollectionParser;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import htw_berlin.de.htwplus.androidapp.ApplicationController;
+import htw_berlin.de.htwplus.androidapp.CustomJsonObjectRequest;
 import htw_berlin.de.htwplus.androidapp.datamodel.ApiError;
 import htw_berlin.de.htwplus.androidapp.datamodel.Post;
 import htw_berlin.de.htwplus.androidapp.datamodel.User;
@@ -20,11 +33,6 @@ import htw_berlin.de.htwplus.androidapp.datamodel.User;
 public class JsonCollectionHelper {
 
     private JsonCollectionHelper() {
-    }
-
-    public static Collection parse(String rawJsonCollection) throws IOException {
-        CollectionParser cParser = new CollectionParser();
-        return cParser.parse(rawJsonCollection);
     }
 
     public static List<User> toUsers(Collection collection) {
@@ -79,16 +87,48 @@ public class JsonCollectionHelper {
         return posts;
     }
 
-    public static String extractAccessToken(Collection collection) {
-        String accessToken = null;
-        for (Item item : collection.getItems()) {
-            Data data = item.getData();
-            boolean propertyOk = (hasProperty("access_token", data));
-            if (propertyOk) {
-                accessToken = data.propertyByName("access_token").get().hasValue() ? data.propertyByName("access_token").get().getValue().get().asString() : null;
-            }
-        }
-        return accessToken;
+    public static Collection buildPost(String content, Optional<Long> accountId,
+                                       Optional<Long> ownerId, Optional<Long> parentId,
+                                       Optional<Long> groupId) throws JSONException {
+        String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
+        URI resourceUri = URI.create(ApplicationController.getApiUrl() + "users/" + String.valueOf(accountId.get()) + "?access_token=" + accessToken);
+        List<Link> links = new ArrayList<Link>();
+        List<Query> queries = new ArrayList<Query>();
+
+        List<Item> items = new ArrayList<Item>();
+        Property contentProp = Property.value("content", Optional.some("The content."), content);
+        Property accIdProp = null;
+        if (Optional.fromNullable(accountId).isNone())
+            accIdProp = Property.value("account_id", Optional.some("The account id."), "");
+        else
+            accIdProp = Property.value("account_id", Optional.some("The account id."), accountId.get());
+        Property ownerIdProp = null;
+        if (Optional.fromNullable(ownerId).isNone())
+            ownerIdProp = Property.value("owner_id", Optional.some("The owner id."), "");
+        else
+            ownerIdProp = Property.value("owner_id", Optional.some("The owner id."), ownerId.get());
+        Property parentIdProp = null;
+        if (Optional.fromNullable(parentId).isNone())
+            parentIdProp = Property.value("parent_id", Optional.some("The parent id."), "");
+        else
+            parentIdProp = Property.value("parent_id", Optional.some("The parent id."), parentId.get());
+        Property groupIdProp = null;
+        if (Optional.fromNullable(groupId).isNone())
+            groupIdProp = Property.value("group_id", Optional.some("The group id."), "");
+        else
+            groupIdProp = Property.value("group_id", Optional.some("The group id."), groupId.get());
+        Item.Builder itemBuilder = Item.builder(resourceUri);
+        itemBuilder.addProperty(contentProp);
+        itemBuilder.addProperty(accIdProp);
+        itemBuilder.addProperty(ownerIdProp);
+        itemBuilder.addProperty(parentIdProp);
+        itemBuilder.addProperty(groupIdProp);
+        Item postItem = itemBuilder.build();
+        items.add(postItem);
+
+        Template template = Template.create();
+
+        return Collection.create(resourceUri, links, items, queries, template, null);
     }
 
     public static ApiError toError(Collection collection) {

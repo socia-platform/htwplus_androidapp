@@ -24,12 +24,14 @@ import net.hamnaberg.json.Template;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 import htw_berlin.de.htwplus.androidapp.datamodel.Post;
 import htw_berlin.de.htwplus.androidapp.datamodel.User;
+import htw_berlin.de.htwplus.androidapp.util.JsonCollectionHelper;
 
 public class VolleyNetworkController {
 
@@ -61,7 +63,6 @@ public class VolleyNetworkController {
             Cache cache = new DiskBasedCache(mContext.getCacheDir());
             Network network = new BasicNetwork(new HurlStack());
             mRequestQueue = new RequestQueue(cache, network);
-            // Don't forget to start the volley request queue
             mRequestQueue.start();
         }
         return mRequestQueue;
@@ -102,8 +103,9 @@ public class VolleyNetworkController {
         String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
         String url = ApplicationController.getApiUrl().toString() + "users/" + userId +
                 "?access_token=" + accessToken;
-        final CollectionJsonGetRequest collJsonGetRequest =
-                new CollectionJsonGetRequest(url, User.class, responseListener, errorListener);
+        final CollectionJsonRequest collJsonGetRequest =
+                new CollectionJsonRequest(Request.Method.GET, url, User.class, null,
+                                          responseListener, errorListener);
         collJsonGetRequest.setTag(tag);
         mRequestQueue.add(collJsonGetRequest);
     }
@@ -112,8 +114,9 @@ public class VolleyNetworkController {
                          Response.ErrorListener errorListener) {
         String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
         String url = ApplicationController.getApiUrl().toString() + "users" + "?access_token=" + accessToken;
-        final CollectionJsonGetRequest collJsonGetRequest =
-                new CollectionJsonGetRequest(url, User.class, responseListener, errorListener);
+        final CollectionJsonRequest collJsonGetRequest =
+                new CollectionJsonRequest(Request.Method.GET, url, User.class, null,
+                                          responseListener, errorListener);
         collJsonGetRequest.setTag(tag);
         mRequestQueue.add(collJsonGetRequest);
     }
@@ -122,8 +125,9 @@ public class VolleyNetworkController {
                         Response.ErrorListener errorListener) {
         String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
         String url = ApplicationController.getApiUrl().toString() + "posts/" + postId + "?access_token=" + accessToken;
-        final CollectionJsonGetRequest collJsonGetRequest =
-                new CollectionJsonGetRequest(url, Post.class, responseListener, errorListener);
+        final CollectionJsonRequest collJsonGetRequest =
+                new CollectionJsonRequest(Request.Method.GET, url, Post.class, null,
+                                          responseListener, errorListener);
         collJsonGetRequest.setTag(tag);
         mRequestQueue.add(collJsonGetRequest);
     }
@@ -132,62 +136,25 @@ public class VolleyNetworkController {
                                        Response.ErrorListener errorListener) {
         String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
         String url = ApplicationController.getApiUrl().toString() + "posts" + "?access_token=" + accessToken;
-        final CollectionJsonGetRequest collJsonGetRequest =
-                new CollectionJsonGetRequest(url, Post.class, responseListener, errorListener);
+        final CollectionJsonRequest collJsonGetRequest =
+                new CollectionJsonRequest(Request.Method.GET, url, Post.class, null,
+                                          responseListener, errorListener);
         collJsonGetRequest.setTag(tag);
         mRequestQueue.add(collJsonGetRequest);
     }
 
-    public void addPost(String content, Optional<Long> accountId, Optional<Long> ownerId, Optional<Long> parentId, Optional<Long> groupId, Object tag,
-                        Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) throws JSONException {
-        String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
-        URI resourceUri = URI.create(ApplicationController.getApiUrl() + "users/" + String.valueOf(accountId.get()) + "?access_token=" + accessToken);
-        List<Link> links = new ArrayList<Link>();
-        List<Query> queries = new ArrayList<Query>();
-
-        List<Item> items = new ArrayList<Item>();
-        Property contentProp = Property.value("content", Optional.some("The content."), content);
-        Property accIdProp = null;
-        if (Optional.fromNullable(accountId).isNone())
-            accIdProp = Property.value("account_id", Optional.some("The account id."), "");
-        else
-            accIdProp = Property.value("account_id", Optional.some("The account id."), accountId.get());
-        Property ownerIdProp = null;
-        if (Optional.fromNullable(ownerId).isNone())
-            ownerIdProp = Property.value("owner_id", Optional.some("The owner id."), "");
-        else
-            ownerIdProp = Property.value("owner_id", Optional.some("The owner id."), ownerId.get());
-        Property parentIdProp = null;
-        if (Optional.fromNullable(parentId).isNone())
-            parentIdProp = Property.value("parent_id", Optional.some("The parent id."), "");
-        else
-            parentIdProp = Property.value("parent_id", Optional.some("The parent id."), parentId.get());
-        Property groupIdProp = null;
-        if (Optional.fromNullable(groupId).isNone())
-            groupIdProp = Property.value("group_id", Optional.some("The group id."), "");
-        else
-            groupIdProp = Property.value("group_id", Optional.some("The group id."), groupId.get());
-        Item.Builder itemBuilder = Item.builder(resourceUri);
-        itemBuilder.addProperty(contentProp);
-        itemBuilder.addProperty(accIdProp);
-        itemBuilder.addProperty(ownerIdProp);
-        itemBuilder.addProperty(parentIdProp);
-        itemBuilder.addProperty(groupIdProp);
-        Item postItem = itemBuilder.build();
-        items.add(postItem);
-
-        Template template = Template.create();
-
-        Collection collection = Collection.create(resourceUri, links, items, queries, template, null);
-
-        JSONObject postJson = new JSONObject(collection.toString());
-
+    public void addPost(String content, Optional<Long> accountId, Optional<Long> ownerId,
+                        Optional<Long> parentId, Optional<Long> groupId, Object tag,
+                        Response.Listener<JSONObject> responseListener,
+                        Response.ErrorListener errorListener) throws JSONException {
+        Collection collectionJson = JsonCollectionHelper.buildPost(content, accountId, ownerId,
+                                                                   parentId, groupId);
         String url = ApplicationController.getApiUrl().toString() + "posts";
-        final CustomJsonObjectRequest jsonRequest = new CustomJsonObjectRequest(Request.Method.POST, url, postJson, responseListener, errorListener);
-        jsonRequest.setTag(tag);
-        mRequestQueue.add(jsonRequest);
-
-        //throw new UnsupportedOperationException("addPost() still need to be implemented.");
+        final CollectionJsonRequest collJsonPostRequest =
+                new CollectionJsonRequest(Request.Method.POST, url, Post.class, collectionJson,
+                        responseListener, errorListener);
+        collJsonPostRequest.setTag(tag);
+        mRequestQueue.add(collJsonPostRequest);
     }
 
 }

@@ -5,6 +5,7 @@ import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.HttpHeaderParser;
 
 import net.hamnaberg.json.Collection;
@@ -24,36 +25,50 @@ import htw_berlin.de.htwplus.androidapp.util.JsonCollectionHelper;
 /**
  * Created by tino on 04.10.15.
  */
-public class CollectionJsonGetRequest<T> extends Request<T> {
+public class CollectionJsonRequest<T> extends Request<T> {
+    /** Charset for request. */
+    private static final String PROTOCOL_CHARSET = "utf-8";
+    /** Content type for request. */
+    private static final String PROTOCOL_CONTENT_TYPE =
+            String.format("application/vnd.collection+json; charset=%s", PROTOCOL_CHARSET);
     private final static CollectionParser collectionParser = new CollectionParser();
     private final Response.Listener<T> listener;
     private final Map<String, String> customHeaders;
     private final Class<T> clazz;
+    private Collection body;
 
-    public CollectionJsonGetRequest(String url, Class<T> clazz, Map<String, String> customHeaders,
-                                    Response.Listener<T> listener,
-                                    Response.ErrorListener errorListener) {
-        super(Method.GET, url, errorListener);
+    public CollectionJsonRequest(int method, String url, Class<T> clazz,
+                                 Map<String, String> customHeaders,
+                                 Collection body, Response.Listener<T> listener,
+                                 Response.ErrorListener errorListener) {
+        super(method, url, errorListener);
         boolean isOk = ((url != null) && (!url.isEmpty()) && (customHeaders != null)
-                        && (listener != null) && (errorListener != null));
+                        && (listener != null) && (errorListener != null)
+                        && (((body != null) && (Method.POST == method))
+                        || ((body == null) && (Method.GET == method))));
+
         if (isOk) {
             this.listener = listener;
             this.customHeaders = customHeaders;
             this.clazz = clazz;
+            this.body = body;
         } else
             throw new IllegalArgumentException("Invalid arguments.");
     }
 
-    public CollectionJsonGetRequest(String url, Class<T> clazz,
-                                    Response.Listener<T> listener,
-                                    Response.ErrorListener errorListener) {
+    public CollectionJsonRequest(int method, String url, Class<T> clazz, Collection body,
+                                 Response.Listener<T> listener,
+                                 Response.ErrorListener errorListener) {
         super(Method.GET, url, errorListener);
-        boolean isOk = ((url != null) && (!url.isEmpty()) && (listener != null)
-                        && (errorListener != null));
+        boolean isOk = ((url != null) && (!url.isEmpty())
+                        && (errorListener != null) && (listener != null)
+                        && (((body != null) && (Method.POST == method))
+                        || ((body == null) && (Method.GET == method))));
         if (isOk) {
             this.listener = listener;
             this.customHeaders = new HashMap<String, String>();
             this.clazz = clazz;
+            this.body = body;
         } else
             throw new IllegalArgumentException("Invalid arguments.");
     }
@@ -98,8 +113,27 @@ public class CollectionJsonGetRequest<T> extends Request<T> {
 
     @Override
     public Map getHeaders() throws AuthFailureError {
-        customHeaders.put("Accept", "application/vnd.collection+json; charset=utf-8");
+        customHeaders.put("Accept", PROTOCOL_CONTENT_TYPE);
+        customHeaders.put("Content-Type", PROTOCOL_CONTENT_TYPE);
         return customHeaders;
+    }
+
+    @Override
+    public String getBodyContentType() {
+        return PROTOCOL_CONTENT_TYPE;
+    }
+
+    @Override
+    public byte[] getBody() {
+        byte[] returnBody = null;
+        try {
+            if (body != null)
+                returnBody = body.toString().getBytes(PROTOCOL_CHARSET);
+        } catch (UnsupportedEncodingException uee) {
+            VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s",
+                    body.toString(), PROTOCOL_CHARSET);
+        }
+        return returnBody;
     }
 
     private Collection parseToCollection(String rawJsonCollection) throws IOException {
