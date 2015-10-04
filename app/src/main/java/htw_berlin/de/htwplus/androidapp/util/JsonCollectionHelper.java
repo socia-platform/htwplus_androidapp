@@ -32,8 +32,10 @@ public class JsonCollectionHelper {
         for (Item item : collection.getItems()) {
             Data data = item.getData();
             boolean hrefOk = (!item.getHref().isNone());
-            boolean propertyOk = ((hasProperty("firstname", data)) && (hasProperty("lastname", data))
-                                 && (hasProperty("email", data)) && (hasProperty("studycourse", data)));
+            boolean propertyOk = ((hasProperty("firstname", data))
+                                 && (hasProperty("lastname", data))
+                                 && (hasProperty("email", data))
+                                 && (hasProperty("studycourse_id", data)));
             if (hrefOk && propertyOk) {
                 URI resourceUri = item.getHref().get();
                 String[] segments = resourceUri.getPath().split("/");
@@ -42,7 +44,8 @@ public class JsonCollectionHelper {
                 String firstName = data.propertyByName("firstname").get().hasValue() ? data.propertyByName("firstname").get().getValue().get().asString() : "";
                 String lastName = data.propertyByName("lastname").get().hasValue() ? data.propertyByName("lastname").get().getValue().get().asString() : "";
                 String email = data.propertyByName("email").get().hasValue() ? data.propertyByName("email").get().getValue().get().asString() : "";
-                String course = data.propertyByName("studycourse").get().hasValue() ? data.propertyByName("studycourse").get().getValue().get().asString() : "";
+                String course = data.propertyByName("studycourse_id").get().hasValue() ? data
+                        .propertyByName("studycourse_id").get().getValue().get().asString() : "";
                 users.add(new User(accountId, firstName, lastName, email, course));
             }
         }
@@ -94,7 +97,7 @@ public class JsonCollectionHelper {
 
     private static boolean hasProperty(String propertyName, Data data) {
         boolean hasProperty = false;
-        if (!data.propertyByName(propertyName).isNone());
+        if (!data.propertyByName(propertyName).isNone())
             hasProperty = true;
         return hasProperty;
     }

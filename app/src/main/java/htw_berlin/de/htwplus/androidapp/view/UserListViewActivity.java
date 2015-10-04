@@ -3,8 +3,6 @@ package htw_berlin.de.htwplus.androidapp.view;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -44,35 +42,10 @@ public class UserListViewActivity extends Activity implements Response.Listener,
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(view.getContext(), ShowUserActivity.class);
-                intent.putExtra("Firstname", mlist.get(position).getFirstName());
-                intent.putExtra("Lastname", mlist.get(position).getLastName());
-                intent.putExtra("Email", mlist.get(position).getEmail());
-                intent.putExtra("Class", mlist.get(position).getClass());
+                intent.putExtra("accountId", mlist.get(position).getAccountId());
                 UserListViewActivity.this.startActivity(intent);
             }
         });
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_user_list_view, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        Toast.makeText(this, id, Toast.LENGTH_SHORT).show();
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
