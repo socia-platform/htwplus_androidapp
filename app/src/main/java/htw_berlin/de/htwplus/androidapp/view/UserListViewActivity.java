@@ -59,18 +59,7 @@ public class UserListViewActivity extends Activity implements Response.Listener,
 
     @Override
     public void onResponse(Object response) {
-        try {
-            Collection collection = JsonCollectionHelper.parse(response.toString());
-            if (!JsonCollectionHelper.hasError(collection)) {
-                List<User> users = JsonCollectionHelper.toUsers(collection);
-                for (User user : users)
-                    mlist.add(user);
-                mAdapter.notifyDataSetChanged();
-            } else {
-                ApiError apiError = JsonCollectionHelper.toError(collection);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        mlist.addAll((List<User>)response);
+        mAdapter.notifyDataSetChanged();
     }
 }

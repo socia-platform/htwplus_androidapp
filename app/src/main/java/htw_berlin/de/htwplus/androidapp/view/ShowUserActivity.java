@@ -2,26 +2,19 @@ package htw_berlin.de.htwplus.androidapp.view;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
-import net.hamnaberg.json.Collection;
-
 import java.util.List;
 
 import htw_berlin.de.htwplus.androidapp.ApplicationController;
 import htw_berlin.de.htwplus.androidapp.R;
-import htw_berlin.de.htwplus.androidapp.datamodel.ApiError;
 import htw_berlin.de.htwplus.androidapp.datamodel.User;
-import htw_berlin.de.htwplus.androidapp.util.JsonCollectionHelper;
 
 public class ShowUserActivity extends Activity implements Response.Listener, Response.ErrorListener {
-
     public static final String REQUEST_TAG = "ShowUserActivity";
     private int accountId;
     private User account;
@@ -53,19 +46,9 @@ public class ShowUserActivity extends Activity implements Response.Listener, Res
 
     @Override
     public void onResponse(Object response) {
-        try {
-            Collection collection = JsonCollectionHelper.parse(response.toString());
-            if (!JsonCollectionHelper.hasError(collection)) {
-                List<User> users = JsonCollectionHelper.toUsers(collection);
-                if (users.size() == 1) {
-                    account = users.get(0);
-                    fillStateInformations();
-                }
-            } else {
-                ApiError apiError = JsonCollectionHelper.toError(collection);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (((List<User>)response).size() == 1) {
+            account = ((List<User>)response).get(0);
+            fillStateInformations();
         }
     }
 

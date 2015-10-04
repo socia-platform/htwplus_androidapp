@@ -28,6 +28,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import htw_berlin.de.htwplus.androidapp.datamodel.User;
+
 public class VolleyNetworkController {
 
     private static VolleyNetworkController mInstance;
@@ -98,17 +100,19 @@ public class VolleyNetworkController {
         String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
         String url = ApplicationController.getApiUrl().toString() + "users/" + userId +
                 "?access_token=" + accessToken;
-        final CustomJsonObjectRequest jsonRequest = new CustomJsonObjectRequest(Request.Method.GET, url, new JSONObject(), responseListener, errorListener);
-        jsonRequest.setTag(tag);
-        mRequestQueue.add(jsonRequest);
+        final CollectionJsonGetRequest collJsonGetRequest =
+                new CollectionJsonGetRequest(url, User.class, responseListener, errorListener);
+        collJsonGetRequest.setTag(tag);
+        mRequestQueue.add(collJsonGetRequest);
     }
 
     public void getUsers(Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
         String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
         String url = ApplicationController.getApiUrl().toString() + "users" + "?access_token=" + accessToken;
-        final CustomJsonObjectRequest jsonRequest = new CustomJsonObjectRequest(Request.Method.GET, url, new JSONObject(), responseListener, errorListener);
-        jsonRequest.setTag(tag);
-        mRequestQueue.add(jsonRequest);
+        final CollectionJsonGetRequest collJsonGetRequest =
+                new CollectionJsonGetRequest(url, User.class, responseListener, errorListener);
+        collJsonGetRequest.setTag(tag);
+        mRequestQueue.add(collJsonGetRequest);
     }
 
     public void getPost(long postId, Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
