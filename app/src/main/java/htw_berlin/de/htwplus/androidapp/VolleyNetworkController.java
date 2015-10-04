@@ -79,6 +79,21 @@ public class VolleyNetworkController {
         mRequestQueue.add(stringRequest);
     }
 
+    public void refreshAccessToken(String accessToken, String refreshToken, Object tag,
+                                   Response.Listener<String> responseListener,
+                                   Response.ErrorListener errorListener) {
+        SharedPreferencesController shCon = ApplicationController.getSharedPrefController();
+        String url = shCon.getApiUrl().toString();
+        url += "oauth2/token?client_id=" + shCon.getClientId();
+        url += "&grant_type=refresh_token&refresh_token=" + refreshToken;
+        url += "&client_secret=" + shCon.getClientSecret();
+        StringRequest stringRequest = new StringRequest(Request.Method.POST,
+                                                        url,
+                                                        responseListener,
+                                                        errorListener);
+        mRequestQueue.add(stringRequest);
+    }
+
     public void getUser(long userId, Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
         String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
         String url = ApplicationController.getApiUrl().toString() + "users/" + userId + "?accessToken=" + accessToken;

@@ -119,23 +119,24 @@ public class SharedPreferencesController {
     }
 
     public boolean hasExpiredTimeAccessToken() {
-        return (mSharedPreferences.getInt("expiredTimeAccessToken", -1) != -1);
+        return (mSharedPreferences.getLong("expiredTimeAccessToken", -1) != -1);
     }
 
     public Date getExpiredTimeAccessToken() {
         Date expiredDate = null;
-        int expSeconds = mSharedPreferences.getInt("expiredTimeAccessToken", -1);
+        long expSeconds = mSharedPreferences.getLong("expiredTimeAccessToken", -1);
         if (expSeconds != -1)
-            expiredDate = new Date(System.currentTimeMillis() + (expSeconds * 1000));
+            expiredDate = new Date(expSeconds * 1000);
         return expiredDate;
     }
 
-    public void setExpiredTimeAccessToken(int second) {
-        if (second > 0) {
-            mSPEditor.putInt("expiredTimeAccessToken", second);
+    public void setExpiredTimeAccessToken(Date expiredDate) {
+        if ((expiredDate != null) && (expiredDate.compareTo(new Date()) > 0)) {
+            mSPEditor.putLong("expiredTimeAccessToken", (expiredDate.getTime() / 1000l));
             mSPEditor.commit();
         } else
-            throw new IllegalArgumentException("Second must be greater than 0.");
+            throw new IllegalArgumentException("Elapsed Date must be a valid Date and must be " +
+                    "after current date.");
     }
 
     public void removeExpiredTimeAccessToken() {

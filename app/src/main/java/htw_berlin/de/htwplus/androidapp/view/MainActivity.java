@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.Date;
+
 import htw_berlin.de.htwplus.androidapp.ApplicationController;
 import htw_berlin.de.htwplus.androidapp.R;
 import htw_berlin.de.htwplus.androidapp.SharedPreferencesController;
@@ -15,7 +17,6 @@ import htw_berlin.de.htwplus.androidapp.VolleyNetworkController;
 import htw_berlin.de.htwplus.androidapp.view.dialog.ConfigurationDialogFragment;
 
 public class MainActivity extends FragmentActivity implements ConfigurationDialogFragment.ConfigurationDialogListener {
-    public static final String VOLLEY_REQUEST_TAG = "VolleyMainActivity";
     private Button mConfigButton;
     private Button mPostsButton;
     private Button mContactsButton;
@@ -36,12 +37,6 @@ public class MainActivity extends FragmentActivity implements ConfigurationDialo
     protected void onResume() {
         super.onResume();
         fillStateInformations();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        VolleyNetworkController.getInstance().cancelRequest(VOLLEY_REQUEST_TAG);
     }
 
     @Override
@@ -108,8 +103,18 @@ public class MainActivity extends FragmentActivity implements ConfigurationDialo
         String warningMessage = getText(R.string.common_attention) + "\n\n";
         if (!shCon.hasApiUrl())
             warningMessage += getText(R.string.warning_no_api_url) + "\n";
-        if (!shCon.hasAccessToken())
+        if (!shCon.hasAccessToken() || (shCon.hasAccessToken() && isAccessTokenExpired()))
             warningMessage += getText(R.string.warning_no_access) + "\n\n";
         return warningMessage;
+    }
+
+    private boolean isAccessTokenExpired() {
+        boolean isExpired = true;
+        SharedPreferencesController shCon = ApplicationController.getSharedPrefController();
+        if (shCon.hasAccessToken() && shCon.hasExpiredTimeAccessToken()) {
+            Date expDate = shCon.getExpiredTimeAccessToken();
+            isExpired = expDate.before(new Date());
+        }
+        return isExpired;
     }
 }

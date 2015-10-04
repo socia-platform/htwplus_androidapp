@@ -7,4 +7,5 @@
     <string name="error_host_unreachable">Der Host ist nicht erreichbar</string>
     <string name="error_unexpected_response">Unerwartete Serverantwort</string>
     <string name="access_token_expired_in">Ablaufdatum</string>
+    <string name="info_access_token_refreshed">Access Token wurde erneuert</string>
 </resources>

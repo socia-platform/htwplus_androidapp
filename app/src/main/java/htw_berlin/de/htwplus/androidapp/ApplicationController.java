@@ -3,6 +3,7 @@ package htw_berlin.de.htwplus.androidapp;
 import android.app.Application;
 
 import java.net.URL;
+import java.util.Date;
 
 /**
  * Von dieser Klasse wird bei Start der App nur ein Objekt instanziiert,
@@ -53,8 +54,18 @@ public class ApplicationController extends Application {
 
     public boolean isWorkingState() {
         boolean isWorking = (getSharedPrefController().hasApiUrl() &&
-                             getSharedPrefController().hasAccessToken());
+                             !isAccessTokenExpired());
         return isWorking;
+    }
+
+    private boolean isAccessTokenExpired() {
+        boolean isExpired = true;
+        SharedPreferencesController shCon = ApplicationController.getSharedPrefController();
+        if (shCon.hasAccessToken() && shCon.hasExpiredTimeAccessToken()) {
+            Date expDate = shCon.getExpiredTimeAccessToken();
+            isExpired = expDate.before(new Date());
+        }
+        return isExpired;
     }
 
 }

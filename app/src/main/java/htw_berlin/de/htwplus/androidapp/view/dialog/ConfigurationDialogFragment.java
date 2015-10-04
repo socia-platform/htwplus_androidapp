@@ -22,13 +22,16 @@ import com.android.volley.VolleyError;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import htw_berlin.de.htwplus.androidapp.ApplicationController;
 import htw_berlin.de.htwplus.androidapp.R;
 import htw_berlin.de.htwplus.androidapp.SharedPreferencesController;
 import htw_berlin.de.htwplus.androidapp.VolleyNetworkController;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -41,7 +44,8 @@ public class ConfigurationDialogFragment extends DialogFragment
         public void onConfigurationDialogDismissed();
     }
 
-    public static final String VOLLEY_ACCESS_TOKEN_REQUEST_TAG = "VolleyAccessToken";
+    public static final String VOLLEY_NEW_ACCESS_TOKEN_REQUEST_TAG = "VolleyAccessToken";
+    public static final String VOLLEY_REFRESH_ACCESS_TOKEN_REQUEST_TAG = "VolleyRefreshAccessToken";
     private ConfigurationDialogListener mListener;
     private View mDialogView;
     private TextView mApiUrlLabelTextView;
@@ -51,6 +55,7 @@ public class ConfigurationDialogFragment extends DialogFragment
     private TextView mAccessTokenInfoTextView;
     private TextView mAccessTokenInfoDetailsTextView;
     private Button mOpenAuthViewButton;
+    private Button mResetAccessTokenButton;
 
     @Override
     public void onAttach(Activity activity) {
@@ -81,7 +86,7 @@ public class ConfigurationDialogFragment extends DialogFragment
     @Override
     public void onStop() {
         super.onStop();
-        VolleyNetworkController.getInstance().cancelRequest(VOLLEY_ACCESS_TOKEN_REQUEST_TAG);
+        VolleyNetworkController.getInstance().cancelRequest(VOLLEY_NEW_ACCESS_TOKEN_REQUEST_TAG);
         mListener.onConfigurationDialogDismissed();
     }
 
@@ -96,6 +101,7 @@ public class ConfigurationDialogFragment extends DialogFragment
         mAccessTokenInfoTextView = (TextView) mDialogView.findViewById(R.id.accessTokenInfoTextView);
         mAccessTokenInfoDetailsTextView = (TextView) mDialogView.findViewById(R.id.accessTokenInfoDetailsTextView);
         mOpenAuthViewButton = (Button) mDialogView.findViewById(R.id.openAuthViewButton);
+        mResetAccessTokenButton = (Button) mDialogView.findViewById(R.id.resetAccessTokenButton);
         initiateButtonClickListeners();
 
         return mDialogView;
@@ -115,24 +121,37 @@ public class ConfigurationDialogFragment extends DialogFragment
     @Override
     public void onResponse(Object response) {
         try {
-            JSONObject jsonResponse = new JSONObject((String)response);
-            String accessToken = jsonResponse.getString("access_token");
-            String refreshToken = jsonResponse.getString("refresh_token");
-            int expiredSeconds = jsonResponse.getInt("expires_in");
-            if (!accessToken.isEmpty()) {
-                if (!refreshToken.isEmpty())
-                    ApplicationController.getSharedPrefController().setRefreshToken(refreshToken);
-                if (expiredSeconds > 0)
-                    ApplicationController.getSharedPrefController().setExpiredTimeAccessToken(expiredSeconds);
-                ApplicationController.getSharedPrefController().setAccessToken(accessToken);
-                fillStateInformations();
-            }
+            boolean isAccessTokenExists =
+                    ApplicationController.getSharedPrefController().hasAccessToken();
+            JSONObject jsonResponse = new JSONObject((String) response);
+            onVolleyNewAccessTokenResponse(jsonResponse);
+            fillStateInformations();
+            if (isAccessTokenExists)
+                Toast.makeText(getActivity(),
+                        R.string.info_access_token_refreshed,
+                        Toast.LENGTH_LONG).show();
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(getActivity(),
                     R.string.error_unexpected_response,
                     Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void onVolleyNewAccessTokenResponse(JSONObject jsonResponse) throws JSONException {
+            String accessToken = jsonResponse.getString("access_token");
+            String refreshToken = jsonResponse.getString("refresh_token");
+            int expiredSeconds = jsonResponse.getInt("expires_in");
+            if (!accessToken.isEmpty()) {
+                if (!refreshToken.isEmpty())
+                    ApplicationController.getSharedPrefController().setRefreshToken(refreshToken);
+                if (expiredSeconds > 0) {
+                    long expiredMilliSec = System.currentTimeMillis() + (1000 * expiredSeconds);
+                    ApplicationController.getSharedPrefController().setExpiredTimeAccessToken
+                            (new Date(expiredMilliSec));
+                }
+                ApplicationController.getSharedPrefController().setAccessToken(accessToken);
+            }
     }
 
     private void initiateButtonClickListeners() {
@@ -147,6 +166,13 @@ public class ConfigurationDialogFragment extends DialogFragment
             @Override
             public void onClick(View v) {
                 onOpenAuthViewButtonClicked();
+            }
+        });
+
+        mResetAccessTokenButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onResetAccessTokenButton();
             }
         });
     }
@@ -173,8 +199,10 @@ public class ConfigurationDialogFragment extends DialogFragment
         SharedPreferencesController shCon = ApplicationController.getSharedPrefController();
         if (shCon.hasApiUrl()) {
             if (isHostReachable(shCon.getApiUrl())) {
-                openAuthentificationDialog();
-                fillStateInformations();
+                if (shCon.hasAccessToken() && shCon.hasRefreshToken())
+                    makeRefreshAccessTokenRequest();
+                else
+                    openAuthentificationDialog();
             }
             else
                 Toast.makeText(getActivity(),
@@ -184,6 +212,19 @@ public class ConfigurationDialogFragment extends DialogFragment
             Toast.makeText(getActivity(),
                     R.string.warning_no_api_url,
                     Toast.LENGTH_LONG).show();
+    }
+
+    private void onResetAccessTokenButton() {
+        SharedPreferencesController shCon = ApplicationController.getSharedPrefController();
+        if (shCon.hasAccessToken())
+            shCon.removeAccessToken();
+        if (shCon.hasRefreshToken())
+            shCon.removeRefreshToken();
+        if (shCon.hasExpiredTimeAccessToken())
+            shCon.removeExpiredTimeAccessToken();
+        if (shCon.hasAuthorizationToken())
+            shCon.removeAuthorizationToken();
+        fillStateInformations();
     }
 
     private void fillStateInformations() {
@@ -196,19 +237,24 @@ public class ConfigurationDialogFragment extends DialogFragment
             mApiUrlEditText.setText("");
         }
         if (shCon.hasAccessToken()) {
-            mAccessTokenInfoTextView.setText(getText(R.string.configuration_info_access_token_positive));
+            if (isAccessTokenExpired())
+                mAccessTokenInfoTextView.setText(getText(R.string.configuration_info_access_token_negative_expired));
+            else
+                mAccessTokenInfoTextView.setText(getText(R.string.configuration_info_access_token_positive));
             String details = shCon.getAccessToken();
             if (shCon.hasExpiredTimeAccessToken()) {
                 details += "\n" + getText(R.string.access_token_expired_in) + ": ";
-                details += new SimpleDateFormat("dd.MM.yyyy HH:mm").format(shCon
-                        .getExpiredTimeAccessToken());
+                details += new SimpleDateFormat("dd.MM.yyyy HH:mm").format(
+                        shCon.getExpiredTimeAccessToken());
             }
             mAccessTokenInfoDetailsTextView.setText(details);
             mOpenAuthViewButton.setText(getText(R.string.configuration_open_auth_dialog_button_refresh));
+            mResetAccessTokenButton.setEnabled(true);
         } else {
             mAccessTokenInfoTextView.setText(getText(R.string.configuration_info_access_token_negative));
             mAccessTokenInfoDetailsTextView.setText(getText(R.string.configuration_info_details_access_token));
             mOpenAuthViewButton.setText(getText(R.string.configuration_open_auth_dialog_button));
+            mResetAccessTokenButton.setEnabled(false);
         }
     }
 
@@ -269,8 +315,28 @@ public class ConfigurationDialogFragment extends DialogFragment
         String authToken = ApplicationController.getSharedPrefController().getAuthorizationToken();
         ApplicationController.getVolleyController().getAccessToken(
                 authToken,
-                VOLLEY_ACCESS_TOKEN_REQUEST_TAG,
+                VOLLEY_NEW_ACCESS_TOKEN_REQUEST_TAG,
                 this,
                 this);
+    }
+
+    private void makeRefreshAccessTokenRequest() {
+        String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
+        String refreshToken = ApplicationController.getSharedPrefController().getRefreshToken();
+        ApplicationController.getVolleyController().refreshAccessToken(accessToken,
+                refreshToken,
+                VOLLEY_REFRESH_ACCESS_TOKEN_REQUEST_TAG,
+                this,
+                this);
+    }
+
+    private boolean isAccessTokenExpired() {
+        boolean isExpired = true;
+        SharedPreferencesController shCon = ApplicationController.getSharedPrefController();
+        if (shCon.hasAccessToken() && shCon.hasExpiredTimeAccessToken()) {
+            Date expDate = shCon.getExpiredTimeAccessToken();
+            isExpired = expDate.before(new Date());
+        }
+        return isExpired;
     }
 }

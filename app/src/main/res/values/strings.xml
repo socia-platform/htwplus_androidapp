@@ -27,10 +27,14 @@
     <string name="click_info_open_configuration">Konfiguration öffnen</string>
     <string name="configuration_info_access_token_positive">Access-Token:</string>
     <string name="configuration_info_access_token_negative">Kein Access-Token vorhanden!</string>
+    <string name="configuration_info_access_token_negative_expired">Access-Token abgelaufen!</string>
     <string name="configuration_info_details_access_token">Melde dich an um dich mit HTWPlus verbinden zu können.</string>
     <string name="configuration_open_auth_dialog_button">Anmelden</string>
     <string name="configuration_open_auth_dialog_button_refresh">Refresh</string>
     <string name="main_configuration_button">Einstellungen</string>
 
     <string name="common_attention">Achtung</string>
+    <string name="configuration_reset_access_token_button">Logindaten löschen</string>
+
+
 </resources>

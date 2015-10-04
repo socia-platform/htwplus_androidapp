@@ -71,4 +71,14 @@
         android:layout_marginRight="100dp"
         android:layout_alignParentEnd="true" />
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/configuration_reset_access_token_button"
+        android:id="@+id/resetAccessTokenButton"
+        android:layout_marginRight="100dp"
+        android:layout_below="@+id/openAuthViewButton"
+        android:layout_alignStart="@+id/openAuthViewButton"
+        />
+
 </RelativeLayout>
