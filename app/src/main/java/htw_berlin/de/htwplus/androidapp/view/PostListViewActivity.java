@@ -20,6 +20,7 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import htw_berlin.de.htwplus.androidapp.ApplicationController;
 import htw_berlin.de.htwplus.androidapp.PostAdapter;
@@ -75,18 +76,12 @@ public class PostListViewActivity extends Activity implements Response.Listener,
 
     @Override
     public void onResponse(Object response) {
-        try {
-            Collection collection = JsonCollectionHelper.parse(response.toString());
-            if (!JsonCollectionHelper.hasError(collection)) {
-                if (collection.getHref().get().getPath().contains("api/posts"))
-                    refreshPostData(JsonCollectionHelper.toPosts(collection));
-                else if (collection.getHref().get().getPath().contains("api/users"))
-                    refreshUserData(JsonCollectionHelper.toUsers(collection));
-            } else {
-                ApiError apiError = JsonCollectionHelper.toError(collection);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        List<Object> objects = (List<Object>)response;
+        if (objects.size() > 0) {
+            if(objects.get(0).getClass().equals(Post.class))
+                refreshPostData((List<Post>)(Object)objects);
+            else if (objects.get(0).getClass().equals(User.class))
+                refreshUserData((List<User>)(Object)objects);
         }
     }
 

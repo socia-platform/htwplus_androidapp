@@ -35,7 +35,7 @@ public class JsonCollectionHelper {
             boolean propertyOk = ((hasProperty("firstname", data))
                                  && (hasProperty("lastname", data))
                                  && (hasProperty("email", data))
-                                 && (hasProperty("studycourse_id", data)));
+                                 && (hasProperty("studycourse", data)));
             if (hrefOk && propertyOk) {
                 URI resourceUri = item.getHref().get();
                 String[] segments = resourceUri.getPath().split("/");
@@ -44,8 +44,8 @@ public class JsonCollectionHelper {
                 String firstName = data.propertyByName("firstname").get().hasValue() ? data.propertyByName("firstname").get().getValue().get().asString() : "";
                 String lastName = data.propertyByName("lastname").get().hasValue() ? data.propertyByName("lastname").get().getValue().get().asString() : "";
                 String email = data.propertyByName("email").get().hasValue() ? data.propertyByName("email").get().getValue().get().asString() : "";
-                String course = data.propertyByName("studycourse_id").get().hasValue() ? data
-                        .propertyByName("studycourse_id").get().getValue().get().asString() : "";
+                String course = data.propertyByName("studycourse").get().hasValue() ? data
+                        .propertyByName("studycourse").get().getValue().get().asString() : "";
                 users.add(new User(accountId, firstName, lastName, email, course));
             }
         }
@@ -59,7 +59,8 @@ public class JsonCollectionHelper {
             boolean hrefOk = (!item.getHref().isNone());
             boolean propertyOk = ((hasProperty("content", data)) && (hasProperty("parent_id", data))
                     && (hasProperty("group_id", data)) && (hasProperty("account_id", data))
-                    && (hasProperty("owner_id", data)) && (hasProperty("create_date", data)));
+                    && (hasProperty("owner_id", data)) && (hasProperty("created_at", data))
+                    && (hasProperty("updated_at", data)));
 
             if (hrefOk && propertyOk) {
                 URI resourceUri = item.getHref().get();
@@ -71,7 +72,7 @@ public class JsonCollectionHelper {
                 int groupId = data.propertyByName("group_id").get().hasValue() ? Integer.parseInt(data.propertyByName("group_id").get().getValue().get().asString()) : -1;
                 int accountId = data.propertyByName("account_id").get().hasValue() ? Integer.parseInt(data.propertyByName("account_id").get().getValue().get().asString()) : -1;
                 int ownerId = data.propertyByName("owner_id").get().hasValue() ? Integer.parseInt(data.propertyByName("owner_id").get().getValue().get().asString()) : -1;
-                String creationDate = data.propertyByName("create_date").get().hasValue() ? data.propertyByName("create_date").get().getValue().get().asString() : "";
+                String creationDate = data.propertyByName("created_at").get().hasValue() ? data.propertyByName("created_at").get().getValue().get().asString() : "";
                 posts.add(new Post(postId, content, accountId, ownerId, parentId, groupId, creationDate));
             }
         }

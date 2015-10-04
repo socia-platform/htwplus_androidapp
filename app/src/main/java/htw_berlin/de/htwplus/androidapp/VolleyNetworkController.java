@@ -28,6 +28,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import htw_berlin.de.htwplus.androidapp.datamodel.Post;
 import htw_berlin.de.htwplus.androidapp.datamodel.User;
 
 public class VolleyNetworkController {
@@ -96,7 +97,8 @@ public class VolleyNetworkController {
         mRequestQueue.add(stringRequest);
     }
 
-    public void getUser(long userId, Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
+    public void getUser(long userId, Object tag, Response.Listener<User> responseListener, Response
+            .ErrorListener errorListener) {
         String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
         String url = ApplicationController.getApiUrl().toString() + "users/" + userId +
                 "?access_token=" + accessToken;
@@ -106,7 +108,8 @@ public class VolleyNetworkController {
         mRequestQueue.add(collJsonGetRequest);
     }
 
-    public void getUsers(Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
+    public void getUsers(Object tag, Response.Listener<User> responseListener,
+                         Response.ErrorListener errorListener) {
         String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
         String url = ApplicationController.getApiUrl().toString() + "users" + "?access_token=" + accessToken;
         final CollectionJsonGetRequest collJsonGetRequest =
@@ -115,20 +118,24 @@ public class VolleyNetworkController {
         mRequestQueue.add(collJsonGetRequest);
     }
 
-    public void getPost(long postId, Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
+    public void getPost(long postId, Object tag, Response.Listener<Post> responseListener,
+                        Response.ErrorListener errorListener) {
         String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
         String url = ApplicationController.getApiUrl().toString() + "posts/" + postId + "?access_token=" + accessToken;
-        final CustomJsonObjectRequest jsonRequest = new CustomJsonObjectRequest(Request.Method.GET, url, new JSONObject(), responseListener, errorListener);
-        jsonRequest.setTag(tag);
-        mRequestQueue.add(jsonRequest);
+        final CollectionJsonGetRequest collJsonGetRequest =
+                new CollectionJsonGetRequest(url, Post.class, responseListener, errorListener);
+        collJsonGetRequest.setTag(tag);
+        mRequestQueue.add(collJsonGetRequest);
     }
 
-    public void getPostsFromNewsstream(Object tag, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
+    public void getPostsFromNewsstream(Object tag, Response.Listener<Post> responseListener,
+                                       Response.ErrorListener errorListener) {
         String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
         String url = ApplicationController.getApiUrl().toString() + "posts" + "?access_token=" + accessToken;
-        final CustomJsonObjectRequest jsonRequest = new CustomJsonObjectRequest(Request.Method.GET, url, new JSONObject(), responseListener, errorListener);
-        jsonRequest.setTag(tag);
-        mRequestQueue.add(jsonRequest);
+        final CollectionJsonGetRequest collJsonGetRequest =
+                new CollectionJsonGetRequest(url, Post.class, responseListener, errorListener);
+        collJsonGetRequest.setTag(tag);
+        mRequestQueue.add(collJsonGetRequest);
     }
 
     public void addPost(String content, Optional<Long> accountId, Optional<Long> ownerId, Optional<Long> parentId, Optional<Long> groupId, Object tag,
