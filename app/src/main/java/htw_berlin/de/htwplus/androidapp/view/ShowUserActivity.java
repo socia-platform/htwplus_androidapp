@@ -10,7 +10,7 @@ import com.android.volley.VolleyError;
 
 import java.util.List;
 
-import htw_berlin.de.htwplus.androidapp.ApplicationController;
+import htw_berlin.de.htwplus.androidapp.Application;
 import htw_berlin.de.htwplus.androidapp.R;
 import htw_berlin.de.htwplus.androidapp.datamodel.User;
 
@@ -31,7 +31,7 @@ public class ShowUserActivity extends Activity implements Response.Listener, Res
         ViewClass = (TextView) findViewById(R.id.viewClass);
         accountId = getIntent().getExtras().getInt("accountId");
         account = null;
-        ApplicationController.getVolleyController().getUser(accountId, REQUEST_TAG, this, this);
+        Application.getVolleyController().getUser(accountId, REQUEST_TAG, this, this);
     }
 
 

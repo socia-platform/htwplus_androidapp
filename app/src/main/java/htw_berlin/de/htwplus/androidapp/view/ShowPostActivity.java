@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import htw_berlin.de.htwplus.androidapp.ApplicationController;
+import htw_berlin.de.htwplus.androidapp.Application;
 import htw_berlin.de.htwplus.androidapp.PostAdapter;
 import htw_berlin.de.htwplus.androidapp.R;
 import htw_berlin.de.htwplus.androidapp.datamodel.Post;
@@ -46,8 +46,8 @@ public class ShowPostActivity extends Activity implements Response.Listener, Res
         mPostCommentList = new ArrayList<Post>();
         mUserList = new ArrayList<User>();
         postId = getIntent().getExtras().getInt("postId");
-        ApplicationController.getVolleyController().getUsers(this, this, this);
-        ApplicationController.getVolleyController().getPostsFromNewsstream(this, this, this);
+        Application.getVolleyController().getUsers(this, this, this);
+        Application.getVolleyController().getPosts(this, this, this);
         mPostAdapter = new PostAdapter(this, R.layout.post_listview_item_row, mPostCommentList, mUserList);
         mCommentListview.setAdapter(mPostAdapter);
     }
@@ -57,7 +57,7 @@ public class ShowPostActivity extends Activity implements Response.Listener, Res
             String commentMessage = mCreateNewCommentEditText.getText().toString();
             if (!commentMessage.isEmpty()) {
                 mCreateNewCommentEditText.setText("");
-                ApplicationController.getVolleyController().addPost(commentMessage,
+                Application.getVolleyController().addPost(commentMessage,
                                                                     Optional.some(57l),
                                                                     Optional.some(57l),
                                                                     Optional.some(new Long(postId)),
@@ -65,8 +65,8 @@ public class ShowPostActivity extends Activity implements Response.Listener, Res
                                                                     REQUEST_TAG,
                                                                     this,
                                                                     this);
-                ApplicationController.getVolleyController().getUsers(this, this, this);
-                ApplicationController.getVolleyController().getPostsFromNewsstream(this, this, this);
+                Application.getVolleyController().getUsers(this, this, this);
+                Application.getVolleyController().getPosts(this, this, this);
             } else
                 Toast.makeText(getApplicationContext(), "Bitte Antwort eingeben!", Toast.LENGTH_LONG).show();
         } catch (JSONException jex) {

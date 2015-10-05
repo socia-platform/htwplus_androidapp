@@ -27,8 +27,10 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
-import htw_berlin.de.htwplus.androidapp.ApplicationController;
+import htw_berlin.de.htwplus.androidapp.Application;
 import htw_berlin.de.htwplus.androidapp.R;
 import htw_berlin.de.htwplus.androidapp.SharedPreferencesController;
 import htw_berlin.de.htwplus.androidapp.VolleyNetworkController;
@@ -127,7 +129,7 @@ public class ConfigurationDialogFragment extends DialogFragment
     public void onResponse(Object response) {
         try {
             boolean isAccessTokenExists =
-                    ApplicationController.getSharedPrefController().oAuth2().hasAccessToken();
+                    Application.preferences().oAuth2().hasAccessToken();
             JSONObject jsonResponse = new JSONObject((String) response);
             onVolleyNewAccessTokenResponse(jsonResponse);
             fillStateInformations();
@@ -149,13 +151,13 @@ public class ConfigurationDialogFragment extends DialogFragment
             int expiredSeconds = jsonResponse.getInt("expires_in");
             if (!accessToken.isEmpty()) {
                 if (!refreshToken.isEmpty())
-                    ApplicationController.getSharedPrefController().oAuth2().setRefreshToken(refreshToken);
+                    Application.preferences().oAuth2().setRefreshToken(refreshToken);
                 if (expiredSeconds > 0) {
                     long expiredMilliSec = System.currentTimeMillis() + (1000 * expiredSeconds);
-                    ApplicationController.getSharedPrefController().oAuth2().setExpiredTimeAccessToken
+                    Application.preferences().oAuth2().setExpiredTimeAccessToken
                             (new Date(expiredMilliSec));
                 }
-                ApplicationController.getSharedPrefController().oAuth2().setAccessToken(accessToken);
+                Application.preferences().oAuth2().setAccessToken(accessToken);
             }
     }
 
@@ -201,7 +203,7 @@ public class ConfigurationDialogFragment extends DialogFragment
     }
 
     private void onOpenAuthViewButtonClicked() {
-        SharedPreferencesController shCon = ApplicationController.getSharedPrefController();
+        SharedPreferencesController shCon = Application.preferences();
         if (shCon.apiRoute().hasApiUrl()) {
             if (isHostReachable(shCon.apiRoute().getApiUrl())) {
                 if (shCon.oAuth2().hasAccessToken() && shCon.oAuth2().hasRefreshToken())
@@ -220,7 +222,7 @@ public class ConfigurationDialogFragment extends DialogFragment
     }
 
     private void onResetAccessTokenButton() {
-        SharedPreferencesController shCon = ApplicationController.getSharedPrefController();
+        SharedPreferencesController shCon = Application.preferences();
         if (shCon.oAuth2().hasAccessToken())
             shCon.oAuth2().removeAccessToken();
         if (shCon.oAuth2().hasRefreshToken())
@@ -233,7 +235,7 @@ public class ConfigurationDialogFragment extends DialogFragment
     }
 
     private void fillStateInformations() {
-        SharedPreferencesController shCon = ApplicationController.getSharedPrefController();
+        SharedPreferencesController shCon = Application.preferences();
         if (shCon.apiRoute().hasApiUrl()) {
             mApiUrlLabelTextView.setText(getText(R.string.configuration_info_api_url_positive));
             mApiUrlEditText.setText(shCon.apiRoute().getApiUrl().toString());
@@ -242,7 +244,7 @@ public class ConfigurationDialogFragment extends DialogFragment
             mApiUrlEditText.setText("");
         }
         if (shCon.oAuth2().hasAccessToken()) {
-            if (isAccessTokenExpired())
+            if (shCon.oAuth2().isAccessTokenExpired())
                 mAccessTokenInfoTextView.setText(getText(R.string.configuration_info_access_token_negative_expired));
             else
                 mAccessTokenInfoTextView.setText(getText(R.string.configuration_info_access_token_positive));
@@ -266,7 +268,7 @@ public class ConfigurationDialogFragment extends DialogFragment
     private void fetchApiUrl() throws MalformedURLException, SocketTimeoutException {
         URL apiUrl = new URL(mApiUrlEditText.getText().toString());
         if (isHostReachable(apiUrl))
-            ApplicationController.getSharedPrefController().apiRoute().setApiUrl(apiUrl);
+            Application.preferences().apiRoute().setApiUrl(apiUrl);
         else
             throw new SocketTimeoutException();
     }
@@ -288,7 +290,12 @@ public class ConfigurationDialogFragment extends DialogFragment
     private void openAuthentificationDialog() {
         final WebView webView = (WebView)mAuthDialog.findViewById(R.id.webv);
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.loadUrl(ApplicationController.getSharedPrefController().getAuthorizationUrl().toString());
+        Map<String, String> params = new HashMap<>();
+        params.put("client_secret", Application.preferences().oAuth2().getClientSecret());
+        params.put("redirect_uri", Application.preferences().oAuth2().getAuthCallBackURI());
+        params.put("response_type", "code");
+        params.put("client_id", Application.preferences().oAuth2().getClientId());
+        webView.loadUrl(Application.preferences().apiRoute().authorize(params));
         webView.setWebViewClient(new WebViewClient() {
             boolean authComplete = false;
 
@@ -300,14 +307,14 @@ public class ConfigurationDialogFragment extends DialogFragment
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                String redirectUrl = ApplicationController.getSharedPrefController().oAuth2().getAuthCallBackURI() + "?code=";
+                String redirectUrl = Application.preferences().oAuth2().getAuthCallBackURI() + "?code=";
                 if (url.contains(redirectUrl) && !authComplete) {
                     Uri uri = Uri.parse(url);
                     String authCode = uri.getQueryParameter("code");
-                    ApplicationController.getSharedPrefController().oAuth2().setAuthorizationToken(authCode);
+                    Application.preferences().oAuth2().setAuthorizationToken(authCode);
                     makeAccessTokenRequest();
                     authComplete = true;
-                    ApplicationController.getSharedPrefController().oAuth2().removeAuthorizationToken();
+                    Application.preferences().oAuth2().removeAuthorizationToken();
                     fillStateInformations();
                     mAuthDialog.dismiss();
                 }
@@ -317,31 +324,12 @@ public class ConfigurationDialogFragment extends DialogFragment
     }
 
     private void makeAccessTokenRequest() {
-        String authToken = ApplicationController.getSharedPrefController().oAuth2().getAuthorizationToken();
-        ApplicationController.getVolleyController().getAccessToken(
-                authToken,
-                VOLLEY_NEW_ACCESS_TOKEN_REQUEST_TAG,
-                this,
-                this);
+        Application.getVolleyController().getAccessToken(
+                VOLLEY_NEW_ACCESS_TOKEN_REQUEST_TAG, this, this);
     }
 
     private void makeRefreshAccessTokenRequest() {
-        String accessToken = ApplicationController.getSharedPrefController().oAuth2().getAccessToken();
-        String refreshToken = ApplicationController.getSharedPrefController().oAuth2().getRefreshToken();
-        ApplicationController.getVolleyController().refreshAccessToken(accessToken,
-                refreshToken,
-                VOLLEY_REFRESH_ACCESS_TOKEN_REQUEST_TAG,
-                this,
-                this);
-    }
-
-    private boolean isAccessTokenExpired() {
-        boolean isExpired = true;
-        SharedPreferencesController shCon = ApplicationController.getSharedPrefController();
-        if (shCon.oAuth2().hasAccessToken() && shCon.oAuth2().hasExpiredTimeAccessToken()) {
-            Date expDate = shCon.oAuth2().getExpiredTimeAccessToken();
-            isExpired = expDate.before(new Date());
-        }
-        return isExpired;
+        Application.getVolleyController().refreshAccessToken(
+                VOLLEY_REFRESH_ACCESS_TOKEN_REQUEST_TAG, this, this);
     }
 }

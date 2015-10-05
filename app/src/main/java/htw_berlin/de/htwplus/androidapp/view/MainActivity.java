@@ -8,9 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.util.Date;
-
-import htw_berlin.de.htwplus.androidapp.ApplicationController;
+import htw_berlin.de.htwplus.androidapp.Application;
 import htw_berlin.de.htwplus.androidapp.R;
 import htw_berlin.de.htwplus.androidapp.SharedPreferencesController;
 import htw_berlin.de.htwplus.androidapp.view.dialog.ConfigurationDialogFragment;
@@ -40,8 +38,8 @@ public class MainActivity extends FragmentActivity implements ConfigurationDialo
 
     @Override
     public  void onConfigurationDialogDismissed() {
-        if (!ApplicationController.getInstance().isWorkingState()) {
-            String warningText = buildWarningText(ApplicationController.getSharedPrefController());
+        if (!Application.getInstance().isWorkingState()) {
+            String warningText = buildWarningText(Application.preferences());
             mMainTextView.setText(warningText);
         } else
             mMainTextView.setText("");
@@ -86,8 +84,8 @@ public class MainActivity extends FragmentActivity implements ConfigurationDialo
     }
 
     private void fillStateInformations() {
-        if (!ApplicationController.getInstance().isWorkingState()) {
-            String warningText = buildWarningText(ApplicationController.getSharedPrefController());
+        if (!Application.getInstance().isWorkingState()) {
+            String warningText = buildWarningText(Application.preferences());
             mMainTextView.setText(warningText);
         } else
             mMainTextView.setText("");

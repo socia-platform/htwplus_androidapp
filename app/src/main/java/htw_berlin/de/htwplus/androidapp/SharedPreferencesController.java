@@ -57,22 +57,6 @@ public class SharedPreferencesController {
         return apiRoutePref;
     }
 
-    public URL getAuthorizationUrl() {
-        URL authUrl = null;
-        if (!mSharedPreferences.getString("apiUrl", "").isEmpty() &&
-                !mSharedPreferences.getString("clientId", "").isEmpty()) {
-            try {
-                String addition = "oauth2/authorize?client_id=" + oAuth2Pref.getClientId();
-                addition += "&client_secret=" + oAuth2Pref.getClientSecret();
-                addition += "&response_type=code&redirect_uri=" + oAuth2Pref.getAuthCallBackURI();
-                authUrl = new URL(apiRoutePref.getApiUrl().toString() + addition);
-            } catch (MalformedURLException muex) {
-                Log.d("SharedPrefController", "Exception Occured: ", muex);
-            }
-        }
-        return authUrl;
-    }
-
     public void setCurrentUserId(long userId) {
         if (userId > -1) {
             mSPEditor.putLong("currentUserId", userId);

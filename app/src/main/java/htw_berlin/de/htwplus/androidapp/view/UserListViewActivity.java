@@ -15,7 +15,7 @@ import com.android.volley.VolleyError;
 import java.util.ArrayList;
 import java.util.List;
 
-import htw_berlin.de.htwplus.androidapp.ApplicationController;
+import htw_berlin.de.htwplus.androidapp.Application;
 import htw_berlin.de.htwplus.androidapp.R;
 import htw_berlin.de.htwplus.androidapp.datamodel.User;
 
@@ -30,7 +30,7 @@ public class UserListViewActivity extends Activity implements Response.Listener,
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_list_view);
         mlist = new ArrayList<User>();
-        ApplicationController.getVolleyController().getUsers(this, this, this);
+        Application.getVolleyController().getUsers(this, this, this);
         listview = (ListView) findViewById(R.id.list);
         mAdapter = new ArrayAdapter<User>(this, android.R.layout.simple_list_item_1, mlist);
         listview.setAdapter(mAdapter);

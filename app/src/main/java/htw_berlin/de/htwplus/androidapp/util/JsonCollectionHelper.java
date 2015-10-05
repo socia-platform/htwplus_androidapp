@@ -16,7 +16,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import htw_berlin.de.htwplus.androidapp.ApplicationController;
+import htw_berlin.de.htwplus.androidapp.Application;
 import htw_berlin.de.htwplus.androidapp.datamodel.ApiError;
 import htw_berlin.de.htwplus.androidapp.datamodel.Post;
 import htw_berlin.de.htwplus.androidapp.datamodel.User;
@@ -84,8 +84,8 @@ public class JsonCollectionHelper {
     public static Collection buildPost(String content, Optional<Long> accountId,
                                        Optional<Long> ownerId, Optional<Long> parentId,
                                        Optional<Long> groupId) throws JSONException {
-        String accessToken = ApplicationController.getSharedPrefController().oAuth2().getAccessToken();
-        String apiUrl = ApplicationController.getSharedPrefController().apiRoute().getApiUrl()
+        String accessToken = Application.preferences().oAuth2().getAccessToken();
+        String apiUrl = Application.preferences().apiRoute().getApiUrl()
                 .toString();
         URI resourceUri = URI.create(apiUrl + "users/" + String.valueOf(accountId.get()) +
                 "?access_token=" + accessToken);

@@ -20,7 +20,7 @@ import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.List;
 
-import htw_berlin.de.htwplus.androidapp.ApplicationController;
+import htw_berlin.de.htwplus.androidapp.Application;
 import htw_berlin.de.htwplus.androidapp.PostAdapter;
 import htw_berlin.de.htwplus.androidapp.R;
 import htw_berlin.de.htwplus.androidapp.datamodel.Post;
@@ -46,8 +46,8 @@ public class PostListViewActivity extends Activity implements Response.Listener,
         mPostlist = new ArrayList<Post>();
         mPostCommentlist = new ArrayList<Post>();
         mUserlist = new ArrayList<User>();
-        ApplicationController.getVolleyController().getUsers(this, this, this);
-        ApplicationController.getVolleyController().getPostsFromNewsstream(this, this, this);
+        Application.getVolleyController().getUsers(this, this, this);
+        Application.getVolleyController().getPosts(this, this, this);
         mlistview = (ListView) findViewById(R.id.list);
         mPostAdapter = new PostAdapter(this, R.layout.post_listview_item_row, mPostlist, mUserlist);
         mlistview.setAdapter(mPostAdapter);
@@ -94,10 +94,10 @@ public class PostListViewActivity extends Activity implements Response.Listener,
             String postMessage = mCreateNewPostEditText.getText().toString();
             if (!postMessage.isEmpty()) {
                 mCreateNewPostEditText.setText("");
-                ApplicationController.getVolleyController().addPost(postMessage, Optional.some(57l),
+                Application.getVolleyController().addPost(postMessage, Optional.some(57l),
                         Optional.some(57l), null, null, REQUEST_TAG, this, this);
-                ApplicationController.getVolleyController().getUsers(this, this, this);
-                ApplicationController.getVolleyController().getPostsFromNewsstream(this, this, this);
+                Application.getVolleyController().getUsers(this, this, this);
+                Application.getVolleyController().getPosts(this, this, this);
             } else
                 Toast.makeText(getApplicationContext(), "Bitte Post-Message eingeben!", Toast.LENGTH_LONG).show();
         } catch (JSONException jex) {

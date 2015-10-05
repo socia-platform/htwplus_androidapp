@@ -2,15 +2,28 @@ package htw_berlin.de.htwplus.androidapp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.util.Log;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.Map;
 
 /**
  * Created by tino on 05.10.15.
  */
 public class ApiRoutePreferences {
+    private final static String ONE_USER_RESOURCE = "users/";
+    private final static String ALL_USER_RESOURCES = "users";
+    private final static String ONE_POST_RESOURCE = "posts/";
+    private final static String ALL_POST_RESOURCES = "posts";
+    private final static String OAUTH2_AUTHORIZE = "oauth2/authorize";
+    private final static String OAUTH2_TOKEN = "oauth2/token";
+    private final static String OAUTH2_CODE = "oauth2/code";
+    private final static String PROTOCOL_CHARSET = "utf-8";
+
     private static ApiRoutePreferences mInstance;
     private static Context mContext;
     private SharedPreferences mSharedPreferences;
@@ -21,7 +34,6 @@ public class ApiRoutePreferences {
         mSharedPreferences =
                 context.getSharedPreferences("ApiRoutePreferences", Context.MODE_PRIVATE);
         mSPEditor = mSharedPreferences.edit();
-        setInitialPreferences();
     }
 
     public static synchronized ApiRoutePreferences getInstance(Context context) {
@@ -36,11 +48,6 @@ public class ApiRoutePreferences {
             throw new IllegalStateException(SharedPreferencesController.class.getSimpleName() +
                     " is not initialized, call getInstance(..) method first.");
         return mInstance;
-    }
-
-    private void setInitialPreferences() {
-
-        mSPEditor.commit();
     }
 
     public boolean hasApiUrl() {
@@ -69,10 +76,52 @@ public class ApiRoutePreferences {
         return apiUrl;
     }
 
-    public void removeApiUrl() {
-        if (hasApiUrl()) {
-            mSPEditor.remove("apiUrl");
-            mSPEditor.commit();
+    public String authorize(Map<String, String> params) {
+        return String.format("%s%s%s", getApiUrl(), OAUTH2_AUTHORIZE, buildParamString(params));
+    }
+
+    public String code(Map<String, String> params) {
+        return String.format("%s%s%s", getApiUrl(), OAUTH2_CODE, buildParamString(params));
+    }
+
+    public String token(Map<String, String> params) {
+        return String.format("%s%s%s", getApiUrl(), OAUTH2_TOKEN, buildParamString(params));
+    }
+
+    public String user(long id, Map<String, String> params) {
+        return String.format("%s%s%d%s", getApiUrl(), ONE_USER_RESOURCE,
+                id, buildParamString(params));
+    }
+
+    public String users(Map<String, String> params) {
+        return String.format("%s%s%s", getApiUrl(), ALL_USER_RESOURCES, buildParamString(params));
+    }
+
+    public String post(long id, Map<String, String> params) {
+        return String.format("%s%s%d%s", getApiUrl(), ONE_POST_RESOURCE,
+                id, buildParamString(params));
+    }
+
+    public String posts(Map<String, String> params) {
+        return String.format("%s%s%s", getApiUrl(), ALL_POST_RESOURCES, buildParamString(params));
+    }
+
+    private String buildParamString(Map<String, String> params) {
+        StringBuilder builder = new StringBuilder();
+        for (Map.Entry<String, String> param : params.entrySet())
+        {
+            try {
+                if (builder.toString().contains("?"))
+                    builder.append('&');
+                else
+                    builder.append('?');
+                builder.append(URLEncoder.encode(param.getKey(), PROTOCOL_CHARSET));
+                builder.append('=');
+                builder.append(URLEncoder.encode(param.getValue(), PROTOCOL_CHARSET));
+            } catch (UnsupportedEncodingException e) {
+                Log.d("ApiRoutePreferences", "Exception Occured: ", e);
+            }
         }
+        return builder.toString();
     }
 }

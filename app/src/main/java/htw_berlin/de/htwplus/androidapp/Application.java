@@ -1,9 +1,5 @@
 package htw_berlin.de.htwplus.androidapp;
 
-import android.app.Application;
-
-import java.util.Date;
-
 /**
  * Von dieser Klasse wird bei Start der App nur ein Objekt instanziiert,
  * auf welches dann global zugegriffen werden kann (Singleton). Diese
@@ -19,9 +15,9 @@ import java.util.Date;
  *
  * Created by tino on 23.06.15.
  */
-public class ApplicationController extends Application {
+public class Application extends android.app.Application {
 
-    private static ApplicationController mInstance;
+    private static Application mInstance;
     private static VolleyNetworkController vncInstance;
     private static SharedPreferencesController spcInstance;
 
@@ -35,7 +31,7 @@ public class ApplicationController extends Application {
                                                                 MODE_PRIVATE);
     }
 
-    public static synchronized ApplicationController getInstance() {
+    public static synchronized Application getInstance() {
         return mInstance;
     }
 
@@ -43,13 +39,13 @@ public class ApplicationController extends Application {
         return vncInstance;
     }
 
-    public static SharedPreferencesController getSharedPrefController() {
+    public static SharedPreferencesController preferences() {
         return spcInstance;
     }
 
     public boolean isWorkingState() {
-        boolean isWorking = (getSharedPrefController().apiRoute().hasApiUrl() &&
-                             !getSharedPrefController().oAuth2().isAccessTokenExpired());
+        boolean isWorking = (preferences().apiRoute().hasApiUrl() &&
+                             !preferences().oAuth2().isAccessTokenExpired());
         return isWorking;
     }
 }
