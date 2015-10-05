@@ -149,7 +149,9 @@ public class VolleyNetworkController {
                         Response.ErrorListener errorListener) throws JSONException {
         Collection collectionJson = JsonCollectionHelper.buildPost(content, accountId, ownerId,
                                                                    parentId, groupId);
-        String url = ApplicationController.getApiUrl().toString() + "posts";
+        String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
+        String url = ApplicationController.getApiUrl().toString()
+                     + "posts" + "?access_token=" + accessToken;
         final CollectionJsonRequest collJsonPostRequest =
                 new CollectionJsonRequest(Request.Method.POST, url, Post.class, collectionJson,
                         responseListener, errorListener);

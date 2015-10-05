@@ -11,6 +11,7 @@ import net.hamnaberg.json.Link;
 import net.hamnaberg.json.Property;
 import net.hamnaberg.json.Query;
 import net.hamnaberg.json.Template;
+import net.hamnaberg.json.Value;
 import net.hamnaberg.json.parser.CollectionParser;
 
 import org.json.JSONException;
@@ -99,22 +100,22 @@ public class JsonCollectionHelper {
         Property contentProp = Property.value("content", Optional.some("The content."), content);
         Property accIdProp = null;
         if (Optional.fromNullable(accountId).isNone())
-            accIdProp = Property.value("account_id", Optional.some("The account id."), "");
+            accIdProp = Property.value("account_id", Optional.some("The account id."), Optional.<Value>none());
         else
             accIdProp = Property.value("account_id", Optional.some("The account id."), accountId.get());
         Property ownerIdProp = null;
         if (Optional.fromNullable(ownerId).isNone())
-            ownerIdProp = Property.value("owner_id", Optional.some("The owner id."), "");
+            ownerIdProp = Property.value("owner_id", Optional.some("The owner id."), Optional.<Value>none());
         else
             ownerIdProp = Property.value("owner_id", Optional.some("The owner id."), ownerId.get());
         Property parentIdProp = null;
         if (Optional.fromNullable(parentId).isNone())
-            parentIdProp = Property.value("parent_id", Optional.some("The parent id."), "");
+            parentIdProp = Property.value("parent_id", Optional.some("The parent id."), Optional.<Value>none());
         else
             parentIdProp = Property.value("parent_id", Optional.some("The parent id."), parentId.get());
         Property groupIdProp = null;
         if (Optional.fromNullable(groupId).isNone())
-            groupIdProp = Property.value("group_id", Optional.some("The group id."), "");
+            groupIdProp = Property.value("group_id", Optional.some("The group id."), Optional.<Value>none());
         else
             groupIdProp = Property.value("group_id", Optional.some("The group id."), groupId.get());
         Item.Builder itemBuilder = Item.builder(resourceUri);

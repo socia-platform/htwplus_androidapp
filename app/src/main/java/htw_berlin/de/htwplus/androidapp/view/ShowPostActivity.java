@@ -61,8 +61,8 @@ public class ShowPostActivity extends Activity implements Response.Listener, Res
             if (!commentMessage.isEmpty()) {
                 mCreateNewCommentEditText.setText("");
                 ApplicationController.getVolleyController().addPost(commentMessage,
-                                                                    Optional.some(28l),
-                                                                    Optional.some(28l),
+                                                                    Optional.some(57l),
+                                                                    Optional.some(57l),
                                                                     Optional.some(new Long(postId)),
                                                                     null,
                                                                     REQUEST_TAG,
@@ -89,12 +89,14 @@ public class ShowPostActivity extends Activity implements Response.Listener, Res
 
     @Override
     public void onResponse(Object response) {
-        List<Object> objects = (List<Object>)response;
-        if (objects.size() > 0) {
-            if(objects.get(0).getClass().equals(Post.class))
-                refreshPostData((List<Post>)(Object)objects);
-            else if (objects.get(0).getClass().equals(User.class))
-                refreshUserData((List<User>)(Object)objects);
+        if (response != null) {
+            List<Object> objects = (List<Object>) response;
+            if (objects.size() > 0) {
+                if (objects.get(0).getClass().equals(Post.class))
+                    refreshPostData((List<Post>) (Object) objects);
+                else if (objects.get(0).getClass().equals(User.class))
+                    refreshUserData((List<User>) (Object) objects);
+            }
         }
     }
 

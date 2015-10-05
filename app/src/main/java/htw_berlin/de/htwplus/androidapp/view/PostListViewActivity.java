@@ -76,12 +76,14 @@ public class PostListViewActivity extends Activity implements Response.Listener,
 
     @Override
     public void onResponse(Object response) {
-        List<Object> objects = (List<Object>)response;
-        if (objects.size() > 0) {
-            if(objects.get(0).getClass().equals(Post.class))
-                refreshPostData((List<Post>)(Object)objects);
-            else if (objects.get(0).getClass().equals(User.class))
-                refreshUserData((List<User>)(Object)objects);
+        if (response != null) {
+            List<Object> objects = (List<Object>) response;
+            if (objects.size() > 0) {
+                if (objects.get(0).getClass().equals(Post.class))
+                    refreshPostData((List<Post>) (Object) objects);
+                else if (objects.get(0).getClass().equals(User.class))
+                    refreshUserData((List<User>) (Object) objects);
+            }
         }
     }
 
@@ -90,7 +92,8 @@ public class PostListViewActivity extends Activity implements Response.Listener,
             String postMessage = mCreateNewPostEditText.getText().toString();
             if (!postMessage.isEmpty()) {
                 mCreateNewPostEditText.setText("");
-                ApplicationController.getVolleyController().addPost(postMessage, Optional.some(28l), Optional.some(28l), null, null, REQUEST_TAG, this, this);
+                ApplicationController.getVolleyController().addPost(postMessage, Optional.some(57l),
+                        Optional.some(57l), null, null, REQUEST_TAG, this, this);
                 ApplicationController.getVolleyController().getUsers(this, this, this);
                 ApplicationController.getVolleyController().getPostsFromNewsstream(this, this, this);
             } else

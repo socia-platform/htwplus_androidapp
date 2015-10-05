@@ -59,7 +59,7 @@ public class CollectionJsonRequest<T> extends Request<T> {
     public CollectionJsonRequest(int method, String url, Class<T> clazz, Collection body,
                                  Response.Listener<T> listener,
                                  Response.ErrorListener errorListener) {
-        super(Method.GET, url, errorListener);
+        super(method, url, errorListener);
         boolean isOk = ((url != null) && (!url.isEmpty())
                         && (errorListener != null) && (listener != null)
                         && (((body != null) && (Method.POST == method))
@@ -82,27 +82,31 @@ public class CollectionJsonRequest<T> extends Request<T> {
     protected Response<T> parseNetworkResponse(NetworkResponse response) {
         Response returnResponse = null;
         try {
-            String rawJsonCollection =
-                    new String(response.data, HttpHeaderParser.parseCharset(response.headers));
-            Collection collectionJson = parseToCollection(rawJsonCollection);
-            if (!JsonCollectionHelper.hasError(collectionJson)) {
-                Object parseResult = null;
-                if (clazz.equals(User.class))
-                    parseResult = parseToAccounts(collectionJson);
-                else if (clazz.equals(Post.class))
-                    parseResult = parseToPosts(collectionJson);
-                else {
-                    String ms = "Expected return class type is not supported";
-                    Response.error(new ParseError(new UnsupportedOperationException(ms)));
+            if (response.data.length > 0) {
+                String rawJsonCollection =
+                        new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+                Collection collectionJson = parseToCollection(rawJsonCollection);
+                if (!JsonCollectionHelper.hasError(collectionJson)) {
+                    Object parseResult = null;
+                    if (clazz.equals(User.class))
+                        parseResult = parseToAccounts(collectionJson);
+                    else if (clazz.equals(Post.class))
+                        parseResult = parseToPosts(collectionJson);
+                    else {
+                        String ms = "Expected return class type is not supported";
+                        Response.error(new ParseError(new UnsupportedOperationException(ms)));
+                    }
+                    returnResponse =
+                            Response.success(parseResult, HttpHeaderParser.parseCacheHeaders(response));
+                } else {
+                    ApiError apiError = parseToApiError(collectionJson);
+                    Throwable customThrow = new Throwable(apiError.getMessage());
+                    returnResponse = Response.error(new ParseError(customThrow));
                 }
+            } else if ((response.data.length == 0) && (response.statusCode == 200)) {
                 returnResponse =
-                        Response.success(parseResult, HttpHeaderParser.parseCacheHeaders(response));
-            } else {
-                ApiError apiError = parseToApiError(collectionJson);
-                Throwable customThrow = new Throwable(apiError.getMessage());
-                returnResponse = Response.error(new ParseError(customThrow));
+                        Response.success(null, HttpHeaderParser.parseCacheHeaders(response));
             }
-
         } catch (UnsupportedEncodingException e) {
             returnResponse = Response.error(new ParseError(e));
         } catch (IOException e) {
