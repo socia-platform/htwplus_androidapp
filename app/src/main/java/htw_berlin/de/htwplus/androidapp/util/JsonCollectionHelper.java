@@ -84,7 +84,7 @@ public class JsonCollectionHelper {
     public static Collection buildPost(String content, Optional<Long> accountId,
                                        Optional<Long> ownerId, Optional<Long> parentId,
                                        Optional<Long> groupId) throws JSONException {
-        String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
+        String accessToken = ApplicationController.getSharedPrefController().oAuth2().getAccessToken();
         String apiUrl = ApplicationController.getSharedPrefController().getApiUrl().toString();
         URI resourceUri = URI.create(apiUrl + "users/" + String.valueOf(accountId.get()) +
                 "?access_token=" + accessToken);

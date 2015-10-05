@@ -102,18 +102,9 @@ public class MainActivity extends FragmentActivity implements ConfigurationDialo
         String warningMessage = getText(R.string.common_attention) + "\n\n";
         if (!shCon.hasApiUrl())
             warningMessage += getText(R.string.warning_no_api_url) + "\n";
-        if (!shCon.hasAccessToken() || (shCon.hasAccessToken() && isAccessTokenExpired()))
+        if (!shCon.oAuth2().hasAccessToken() || (shCon.oAuth2().hasAccessToken()
+                && shCon.oAuth2().isAccessTokenExpired()))
             warningMessage += getText(R.string.warning_no_access) + "\n\n";
         return warningMessage;
-    }
-
-    private boolean isAccessTokenExpired() {
-        boolean isExpired = true;
-        SharedPreferencesController shCon = ApplicationController.getSharedPrefController();
-        if (shCon.hasAccessToken() && shCon.hasExpiredTimeAccessToken()) {
-            Date expDate = shCon.getExpiredTimeAccessToken();
-            isExpired = expDate.before(new Date());
-        }
-        return isExpired;
     }
 }

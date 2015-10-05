@@ -49,17 +49,7 @@ public class ApplicationController extends Application {
 
     public boolean isWorkingState() {
         boolean isWorking = (getSharedPrefController().hasApiUrl() &&
-                             !isAccessTokenExpired());
+                             !getSharedPrefController().oAuth2().isAccessTokenExpired());
         return isWorking;
-    }
-
-    private boolean isAccessTokenExpired() {
-        boolean isExpired = true;
-        SharedPreferencesController shCon = ApplicationController.getSharedPrefController();
-        if (shCon.hasAccessToken() && shCon.hasExpiredTimeAccessToken()) {
-            Date expDate = shCon.getExpiredTimeAccessToken();
-            isExpired = expDate.before(new Date());
-        }
-        return isExpired;
     }
 }

@@ -127,7 +127,7 @@ public class ConfigurationDialogFragment extends DialogFragment
     public void onResponse(Object response) {
         try {
             boolean isAccessTokenExists =
-                    ApplicationController.getSharedPrefController().hasAccessToken();
+                    ApplicationController.getSharedPrefController().oAuth2().hasAccessToken();
             JSONObject jsonResponse = new JSONObject((String) response);
             onVolleyNewAccessTokenResponse(jsonResponse);
             fillStateInformations();
@@ -149,13 +149,13 @@ public class ConfigurationDialogFragment extends DialogFragment
             int expiredSeconds = jsonResponse.getInt("expires_in");
             if (!accessToken.isEmpty()) {
                 if (!refreshToken.isEmpty())
-                    ApplicationController.getSharedPrefController().setRefreshToken(refreshToken);
+                    ApplicationController.getSharedPrefController().oAuth2().setRefreshToken(refreshToken);
                 if (expiredSeconds > 0) {
                     long expiredMilliSec = System.currentTimeMillis() + (1000 * expiredSeconds);
-                    ApplicationController.getSharedPrefController().setExpiredTimeAccessToken
+                    ApplicationController.getSharedPrefController().oAuth2().setExpiredTimeAccessToken
                             (new Date(expiredMilliSec));
                 }
-                ApplicationController.getSharedPrefController().setAccessToken(accessToken);
+                ApplicationController.getSharedPrefController().oAuth2().setAccessToken(accessToken);
             }
     }
 
@@ -204,7 +204,7 @@ public class ConfigurationDialogFragment extends DialogFragment
         SharedPreferencesController shCon = ApplicationController.getSharedPrefController();
         if (shCon.hasApiUrl()) {
             if (isHostReachable(shCon.getApiUrl())) {
-                if (shCon.hasAccessToken() && shCon.hasRefreshToken())
+                if (shCon.oAuth2().hasAccessToken() && shCon.oAuth2().hasRefreshToken())
                     makeRefreshAccessTokenRequest();
                 else
                     openAuthentificationDialog();
@@ -221,14 +221,14 @@ public class ConfigurationDialogFragment extends DialogFragment
 
     private void onResetAccessTokenButton() {
         SharedPreferencesController shCon = ApplicationController.getSharedPrefController();
-        if (shCon.hasAccessToken())
-            shCon.removeAccessToken();
-        if (shCon.hasRefreshToken())
-            shCon.removeRefreshToken();
-        if (shCon.hasExpiredTimeAccessToken())
-            shCon.removeExpiredTimeAccessToken();
-        if (shCon.hasAuthorizationToken())
-            shCon.removeAuthorizationToken();
+        if (shCon.oAuth2().hasAccessToken())
+            shCon.oAuth2().removeAccessToken();
+        if (shCon.oAuth2().hasRefreshToken())
+            shCon.oAuth2().removeRefreshToken();
+        if (shCon.oAuth2().hasExpiredTimeAccessToken())
+            shCon.oAuth2().removeExpiredTimeAccessToken();
+        if (shCon.oAuth2().hasAuthorizationToken())
+            shCon.oAuth2().removeAuthorizationToken();
         fillStateInformations();
     }
 
@@ -241,16 +241,16 @@ public class ConfigurationDialogFragment extends DialogFragment
             mApiUrlLabelTextView.setText(getText(R.string.configuration_info_api_url_negative));
             mApiUrlEditText.setText("");
         }
-        if (shCon.hasAccessToken()) {
+        if (shCon.oAuth2().hasAccessToken()) {
             if (isAccessTokenExpired())
                 mAccessTokenInfoTextView.setText(getText(R.string.configuration_info_access_token_negative_expired));
             else
                 mAccessTokenInfoTextView.setText(getText(R.string.configuration_info_access_token_positive));
-            String details = shCon.getAccessToken();
-            if (shCon.hasExpiredTimeAccessToken()) {
+            String details = shCon.oAuth2().getAccessToken();
+            if (shCon.oAuth2().hasExpiredTimeAccessToken()) {
                 details += "\n" + getText(R.string.access_token_expired_in) + ": ";
                 details += new SimpleDateFormat("dd.MM.yyyy HH:mm").format(
-                        shCon.getExpiredTimeAccessToken());
+                        shCon.oAuth2().getExpiredTimeAccessToken());
             }
             mAccessTokenInfoDetailsTextView.setText(details);
             mOpenAuthViewButton.setText(getText(R.string.configuration_open_auth_dialog_button_refresh));
@@ -300,14 +300,14 @@ public class ConfigurationDialogFragment extends DialogFragment
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                String redirectUrl = ApplicationController.getSharedPrefController().getAuthCallBackURI() + "?code=";
+                String redirectUrl = ApplicationController.getSharedPrefController().oAuth2().getAuthCallBackURI() + "?code=";
                 if (url.contains(redirectUrl) && !authComplete) {
                     Uri uri = Uri.parse(url);
                     String authCode = uri.getQueryParameter("code");
-                    ApplicationController.getSharedPrefController().setAuthorizationToken(authCode);
+                    ApplicationController.getSharedPrefController().oAuth2().setAuthorizationToken(authCode);
                     makeAccessTokenRequest();
                     authComplete = true;
-                    ApplicationController.getSharedPrefController().removeAuthorizationToken();
+                    ApplicationController.getSharedPrefController().oAuth2().removeAuthorizationToken();
                     fillStateInformations();
                     mAuthDialog.dismiss();
                 }
@@ -317,7 +317,7 @@ public class ConfigurationDialogFragment extends DialogFragment
     }
 
     private void makeAccessTokenRequest() {
-        String authToken = ApplicationController.getSharedPrefController().getAuthorizationToken();
+        String authToken = ApplicationController.getSharedPrefController().oAuth2().getAuthorizationToken();
         ApplicationController.getVolleyController().getAccessToken(
                 authToken,
                 VOLLEY_NEW_ACCESS_TOKEN_REQUEST_TAG,
@@ -326,8 +326,8 @@ public class ConfigurationDialogFragment extends DialogFragment
     }
 
     private void makeRefreshAccessTokenRequest() {
-        String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
-        String refreshToken = ApplicationController.getSharedPrefController().getRefreshToken();
+        String accessToken = ApplicationController.getSharedPrefController().oAuth2().getAccessToken();
+        String refreshToken = ApplicationController.getSharedPrefController().oAuth2().getRefreshToken();
         ApplicationController.getVolleyController().refreshAccessToken(accessToken,
                 refreshToken,
                 VOLLEY_REFRESH_ACCESS_TOKEN_REQUEST_TAG,
@@ -338,8 +338,8 @@ public class ConfigurationDialogFragment extends DialogFragment
     private boolean isAccessTokenExpired() {
         boolean isExpired = true;
         SharedPreferencesController shCon = ApplicationController.getSharedPrefController();
-        if (shCon.hasAccessToken() && shCon.hasExpiredTimeAccessToken()) {
-            Date expDate = shCon.getExpiredTimeAccessToken();
+        if (shCon.oAuth2().hasAccessToken() && shCon.oAuth2().hasExpiredTimeAccessToken()) {
+            Date expDate = shCon.oAuth2().getExpiredTimeAccessToken();
             isExpired = expDate.before(new Date());
         }
         return isExpired;
