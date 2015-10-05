@@ -67,11 +67,17 @@ public class PostListViewActivity extends Activity implements Response.Listener,
 
     @Override
     public void onErrorResponse(VolleyError error) {
+        String errorMessage = getText(R.string.error_unexpected_response).toString();
         if (error != null) {
-            Toast.makeText(getApplicationContext(), "Error\n", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(getApplicationContext(), "Error is emtpy\n", Toast.LENGTH_SHORT).show();
+            if ((error.getCause() != null) && (error.getCause().getMessage() != null)) {
+                errorMessage += "\n" + error.getCause().getMessage();
+            } else {
+                if (error.getMessage() != null)
+                    errorMessage += "\n" + error.getMessage();
+            }
         }
+        error.printStackTrace();
+        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
     }
 
     @Override

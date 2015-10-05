@@ -111,8 +111,14 @@ public class ConfigurationDialogFragment extends DialogFragment
     public void onErrorResponse(VolleyError error) {
         String errorMessage = getText(R.string.error_unexpected_response).toString();
         if (error != null) {
-            if (error.getMessage() != null)
-                errorMessage += "\n" + error.getMessage();
+            if ((error.getCause() != null) && (error.getCause().getMessage() != null)) {
+                errorMessage += "\n" + error.getCause().getMessage();
+            } else {
+                if (error.getMessage() != null)
+                    errorMessage += "\n" + error.getMessage();
+                else
+                    errorMessage += "\n" + error.toString();
+            }
         }
         error.printStackTrace();
         Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
