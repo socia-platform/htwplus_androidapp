@@ -1,8 +1,5 @@
 package htw_berlin.de.htwplus.androidapp.util;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-
 import net.hamnaberg.funclite.Optional;
 import net.hamnaberg.json.Collection;
 import net.hamnaberg.json.Data;
@@ -12,18 +9,14 @@ import net.hamnaberg.json.Property;
 import net.hamnaberg.json.Query;
 import net.hamnaberg.json.Template;
 import net.hamnaberg.json.Value;
-import net.hamnaberg.json.parser.CollectionParser;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 import htw_berlin.de.htwplus.androidapp.ApplicationController;
-import htw_berlin.de.htwplus.androidapp.CustomJsonObjectRequest;
 import htw_berlin.de.htwplus.androidapp.datamodel.ApiError;
 import htw_berlin.de.htwplus.androidapp.datamodel.Post;
 import htw_berlin.de.htwplus.androidapp.datamodel.User;

@@ -19,10 +19,12 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -30,9 +32,6 @@ import htw_berlin.de.htwplus.androidapp.ApplicationController;
 import htw_berlin.de.htwplus.androidapp.R;
 import htw_berlin.de.htwplus.androidapp.SharedPreferencesController;
 import htw_berlin.de.htwplus.androidapp.VolleyNetworkController;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Created by tino on 22.09.15.

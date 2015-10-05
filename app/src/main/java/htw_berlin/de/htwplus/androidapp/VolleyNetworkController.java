@@ -15,19 +15,9 @@ import com.android.volley.toolbox.Volley;
 
 import net.hamnaberg.funclite.Optional;
 import net.hamnaberg.json.Collection;
-import net.hamnaberg.json.Item;
-import net.hamnaberg.json.Link;
-import net.hamnaberg.json.Property;
-import net.hamnaberg.json.Query;
-import net.hamnaberg.json.Template;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.lang.reflect.Method;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 
 import htw_berlin.de.htwplus.androidapp.datamodel.Post;
 import htw_berlin.de.htwplus.androidapp.datamodel.User;

@@ -13,7 +13,6 @@ import java.util.Date;
 import htw_berlin.de.htwplus.androidapp.ApplicationController;
 import htw_berlin.de.htwplus.androidapp.R;
 import htw_berlin.de.htwplus.androidapp.SharedPreferencesController;
-import htw_berlin.de.htwplus.androidapp.VolleyNetworkController;
 import htw_berlin.de.htwplus.androidapp.view.dialog.ConfigurationDialogFragment;
 
 public class MainActivity extends FragmentActivity implements ConfigurationDialogFragment.ConfigurationDialogListener {

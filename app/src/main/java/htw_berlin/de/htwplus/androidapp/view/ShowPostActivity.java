@@ -12,7 +12,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
 import net.hamnaberg.funclite.Optional;
-import net.hamnaberg.json.Collection;
 
 import org.json.JSONException;
 
@@ -23,10 +22,8 @@ import java.util.List;
 import htw_berlin.de.htwplus.androidapp.ApplicationController;
 import htw_berlin.de.htwplus.androidapp.PostAdapter;
 import htw_berlin.de.htwplus.androidapp.R;
-import htw_berlin.de.htwplus.androidapp.datamodel.ApiError;
 import htw_berlin.de.htwplus.androidapp.datamodel.Post;
 import htw_berlin.de.htwplus.androidapp.datamodel.User;
-import htw_berlin.de.htwplus.androidapp.util.JsonCollectionHelper;
 
 public class ShowPostActivity extends Activity implements Response.Listener, Response.ErrorListener {
 
