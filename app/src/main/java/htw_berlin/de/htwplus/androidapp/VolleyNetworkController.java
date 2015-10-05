@@ -91,8 +91,8 @@ public class VolleyNetworkController {
     public void getUser(long userId, Object tag, Response.Listener<User> responseListener, Response
             .ErrorListener errorListener) {
         String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
-        String url = ApplicationController.getApiUrl().toString() + "users/" + userId +
-                "?access_token=" + accessToken;
+        String apiUrl = ApplicationController.getSharedPrefController().getApiUrl().toString();
+        String url = apiUrl + "users/" + userId + "?access_token=" + accessToken;
         final CollectionJsonRequest collJsonGetRequest =
                 new CollectionJsonRequest(Request.Method.GET, url, User.class, null,
                                           responseListener, errorListener);
@@ -103,7 +103,8 @@ public class VolleyNetworkController {
     public void getUsers(Object tag, Response.Listener<User> responseListener,
                          Response.ErrorListener errorListener) {
         String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
-        String url = ApplicationController.getApiUrl().toString() + "users" + "?access_token=" + accessToken;
+        String apiUrl = ApplicationController.getSharedPrefController().getApiUrl().toString();
+        String url = apiUrl + "users" + "?access_token=" + accessToken;
         final CollectionJsonRequest collJsonGetRequest =
                 new CollectionJsonRequest(Request.Method.GET, url, User.class, null,
                                           responseListener, errorListener);
@@ -114,7 +115,8 @@ public class VolleyNetworkController {
     public void getPost(long postId, Object tag, Response.Listener<Post> responseListener,
                         Response.ErrorListener errorListener) {
         String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
-        String url = ApplicationController.getApiUrl().toString() + "posts/" + postId + "?access_token=" + accessToken;
+        String apiUrl = ApplicationController.getSharedPrefController().getApiUrl().toString();
+        String url = apiUrl + "posts/" + postId + "?access_token=" + accessToken;
         final CollectionJsonRequest collJsonGetRequest =
                 new CollectionJsonRequest(Request.Method.GET, url, Post.class, null,
                                           responseListener, errorListener);
@@ -125,7 +127,8 @@ public class VolleyNetworkController {
     public void getPostsFromNewsstream(Object tag, Response.Listener<Post> responseListener,
                                        Response.ErrorListener errorListener) {
         String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
-        String url = ApplicationController.getApiUrl().toString() + "posts" + "?access_token=" + accessToken;
+        String apiUrl = ApplicationController.getSharedPrefController().getApiUrl().toString();
+        String url = apiUrl + "posts" + "?access_token=" + accessToken;
         final CollectionJsonRequest collJsonGetRequest =
                 new CollectionJsonRequest(Request.Method.GET, url, Post.class, null,
                                           responseListener, errorListener);
@@ -139,9 +142,9 @@ public class VolleyNetworkController {
                         Response.ErrorListener errorListener) throws JSONException {
         Collection collectionJson = JsonCollectionHelper.buildPost(content, accountId, ownerId,
                                                                    parentId, groupId);
+        String apiUrl = ApplicationController.getSharedPrefController().getApiUrl().toString();
         String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
-        String url = ApplicationController.getApiUrl().toString()
-                     + "posts" + "?access_token=" + accessToken;
+        String url = apiUrl + "posts" + "?access_token=" + accessToken;
         final CollectionJsonRequest collJsonPostRequest =
                 new CollectionJsonRequest(Request.Method.POST, url, Post.class, collectionJson,
                         responseListener, errorListener);

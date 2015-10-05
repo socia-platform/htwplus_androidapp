@@ -85,7 +85,9 @@ public class JsonCollectionHelper {
                                        Optional<Long> ownerId, Optional<Long> parentId,
                                        Optional<Long> groupId) throws JSONException {
         String accessToken = ApplicationController.getSharedPrefController().getAccessToken();
-        URI resourceUri = URI.create(ApplicationController.getApiUrl() + "users/" + String.valueOf(accountId.get()) + "?access_token=" + accessToken);
+        String apiUrl = ApplicationController.getSharedPrefController().getApiUrl().toString();
+        URI resourceUri = URI.create(apiUrl + "users/" + String.valueOf(accountId.get()) +
+                "?access_token=" + accessToken);
         List<Link> links = new ArrayList<Link>();
         List<Query> queries = new ArrayList<Query>();
 

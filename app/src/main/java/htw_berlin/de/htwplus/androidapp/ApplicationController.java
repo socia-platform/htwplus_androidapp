@@ -2,7 +2,6 @@ package htw_berlin.de.htwplus.androidapp;
 
 import android.app.Application;
 
-import java.net.URL;
 import java.util.Date;
 
 /**
@@ -40,10 +39,6 @@ public class ApplicationController extends Application {
         return mInstance;
     }
 
-    public static URL getApiUrl() {
-        return spcInstance.getApiUrl();
-    }
-
     public static VolleyNetworkController getVolleyController() {
         return vncInstance;
     }
@@ -67,5 +62,4 @@ public class ApplicationController extends Application {
         }
         return isExpired;
     }
-
 }
