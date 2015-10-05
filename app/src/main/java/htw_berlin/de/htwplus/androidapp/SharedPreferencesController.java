@@ -17,12 +17,14 @@ public class SharedPreferencesController {
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mSPEditor;
     private static OAuth2Preferences oAuth2Pref;
+    private static ApiRoutePreferences apiRoutePref;
 
     private SharedPreferencesController(Context context, String name, int mode) {
         mContext = context;
         mSharedPreferences = context.getSharedPreferences(name, mode);
         mSPEditor = mSharedPreferences.edit();
         oAuth2Pref = OAuth2Preferences.getInstance(context);
+        apiRoutePref = ApiRoutePreferences.getInstance(context);
         setInitialPreferences();
     }
 
@@ -51,37 +53,8 @@ public class SharedPreferencesController {
         return oAuth2Pref;
     }
 
-    public boolean hasApiUrl() {
-        return (!mSharedPreferences.getString("apiUrl", "").isEmpty());
-    }
-
-    public URL getApiUrl() {
-        URL apiUrl = null;
-        try {
-            apiUrl = new URL(mSharedPreferences.getString("apiUrl", null));
-        } catch (MalformedURLException muex) {
-            Log.d("SharedPrefController", "Exception Occured: ", muex);
-        }
-        return apiUrl;
-    }
-
-    public URL setApiUrl(URL apiUrl) {
-        if (apiUrl != null) {
-            String apiUrlString = apiUrl.toString();
-            if (!apiUrlString.endsWith("/"))
-                apiUrlString += "/";
-            mSPEditor.putString("apiUrl", apiUrlString);
-            mSPEditor.commit();
-        } else
-            throw new IllegalArgumentException("Api url may not be null.");
-        return apiUrl;
-    }
-
-    public void removeApiUrl() {
-        if (hasApiUrl()) {
-            mSPEditor.remove("apiUrl");
-            mSPEditor.commit();
-        }
+    public ApiRoutePreferences apiRoute() {
+        return apiRoutePref;
     }
 
     public URL getAuthorizationUrl() {
@@ -92,7 +65,7 @@ public class SharedPreferencesController {
                 String addition = "oauth2/authorize?client_id=" + oAuth2Pref.getClientId();
                 addition += "&client_secret=" + oAuth2Pref.getClientSecret();
                 addition += "&response_type=code&redirect_uri=" + oAuth2Pref.getAuthCallBackURI();
-                authUrl = new URL(getApiUrl().toString() + addition);
+                authUrl = new URL(apiRoutePref.getApiUrl().toString() + addition);
             } catch (MalformedURLException muex) {
                 Log.d("SharedPrefController", "Exception Occured: ", muex);
             }

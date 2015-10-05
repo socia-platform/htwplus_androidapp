@@ -64,7 +64,7 @@ public class VolleyNetworkController {
 
     public void getAccessToken(String authToken, Object tag, Response.Listener<String> responseListener, Response.ErrorListener errorListener) {
         SharedPreferencesController shCon = ApplicationController.getSharedPrefController();
-        String url = shCon.getApiUrl().toString();
+        String url = shCon.apiRoute().getApiUrl().toString();
         url += "oauth2/token?client_id=" + shCon.oAuth2().getClientId();
         url += "&grant_type=authorization_code&code=" + authToken;
         url += "&client_secret=" + shCon.oAuth2().getClientSecret();
@@ -77,7 +77,7 @@ public class VolleyNetworkController {
                                    Response.Listener<String> responseListener,
                                    Response.ErrorListener errorListener) {
         SharedPreferencesController shCon = ApplicationController.getSharedPrefController();
-        String url = shCon.getApiUrl().toString();
+        String url = shCon.apiRoute().getApiUrl().toString();
         url += "oauth2/token?client_id=" + shCon.oAuth2().getClientId();
         url += "&grant_type=refresh_token&refresh_token=" + refreshToken;
         url += "&client_secret=" + shCon.oAuth2().getClientSecret();
@@ -91,7 +91,8 @@ public class VolleyNetworkController {
     public void getUser(long userId, Object tag, Response.Listener<User> responseListener, Response
             .ErrorListener errorListener) {
         String accessToken = ApplicationController.getSharedPrefController().oAuth2().getAccessToken();
-        String apiUrl = ApplicationController.getSharedPrefController().getApiUrl().toString();
+        String apiUrl = ApplicationController.getSharedPrefController().apiRoute().getApiUrl()
+                .toString();
         String url = apiUrl + "users/" + userId + "?access_token=" + accessToken;
         final CollectionJsonRequest collJsonGetRequest =
                 new CollectionJsonRequest(Request.Method.GET, url, User.class, null,
@@ -103,7 +104,8 @@ public class VolleyNetworkController {
     public void getUsers(Object tag, Response.Listener<User> responseListener,
                          Response.ErrorListener errorListener) {
         String accessToken = ApplicationController.getSharedPrefController().oAuth2().getAccessToken();
-        String apiUrl = ApplicationController.getSharedPrefController().getApiUrl().toString();
+        String apiUrl = ApplicationController.getSharedPrefController().apiRoute().getApiUrl()
+                .toString();
         String url = apiUrl + "users" + "?access_token=" + accessToken;
         final CollectionJsonRequest collJsonGetRequest =
                 new CollectionJsonRequest(Request.Method.GET, url, User.class, null,
@@ -115,7 +117,8 @@ public class VolleyNetworkController {
     public void getPost(long postId, Object tag, Response.Listener<Post> responseListener,
                         Response.ErrorListener errorListener) {
         String accessToken = ApplicationController.getSharedPrefController().oAuth2().getAccessToken();
-        String apiUrl = ApplicationController.getSharedPrefController().getApiUrl().toString();
+        String apiUrl = ApplicationController.getSharedPrefController().apiRoute().getApiUrl()
+                .toString();
         String url = apiUrl + "posts/" + postId + "?access_token=" + accessToken;
         final CollectionJsonRequest collJsonGetRequest =
                 new CollectionJsonRequest(Request.Method.GET, url, Post.class, null,
@@ -127,7 +130,8 @@ public class VolleyNetworkController {
     public void getPostsFromNewsstream(Object tag, Response.Listener<Post> responseListener,
                                        Response.ErrorListener errorListener) {
         String accessToken = ApplicationController.getSharedPrefController().oAuth2().getAccessToken();
-        String apiUrl = ApplicationController.getSharedPrefController().getApiUrl().toString();
+        String apiUrl = ApplicationController.getSharedPrefController().apiRoute().getApiUrl()
+                .toString();
         String url = apiUrl + "posts" + "?access_token=" + accessToken;
         final CollectionJsonRequest collJsonGetRequest =
                 new CollectionJsonRequest(Request.Method.GET, url, Post.class, null,
@@ -142,7 +146,8 @@ public class VolleyNetworkController {
                         Response.ErrorListener errorListener) throws JSONException {
         Collection collectionJson = JsonCollectionHelper.buildPost(content, accountId, ownerId,
                                                                    parentId, groupId);
-        String apiUrl = ApplicationController.getSharedPrefController().getApiUrl().toString();
+        String apiUrl = ApplicationController.getSharedPrefController().apiRoute().getApiUrl()
+                .toString();
         String accessToken = ApplicationController.getSharedPrefController().oAuth2().getAccessToken();
         String url = apiUrl + "posts" + "?access_token=" + accessToken;
         final CollectionJsonRequest collJsonPostRequest =

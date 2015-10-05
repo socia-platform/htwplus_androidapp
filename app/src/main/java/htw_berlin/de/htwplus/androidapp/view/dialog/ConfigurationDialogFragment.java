@@ -202,8 +202,8 @@ public class ConfigurationDialogFragment extends DialogFragment
 
     private void onOpenAuthViewButtonClicked() {
         SharedPreferencesController shCon = ApplicationController.getSharedPrefController();
-        if (shCon.hasApiUrl()) {
-            if (isHostReachable(shCon.getApiUrl())) {
+        if (shCon.apiRoute().hasApiUrl()) {
+            if (isHostReachable(shCon.apiRoute().getApiUrl())) {
                 if (shCon.oAuth2().hasAccessToken() && shCon.oAuth2().hasRefreshToken())
                     makeRefreshAccessTokenRequest();
                 else
@@ -234,9 +234,9 @@ public class ConfigurationDialogFragment extends DialogFragment
 
     private void fillStateInformations() {
         SharedPreferencesController shCon = ApplicationController.getSharedPrefController();
-        if (shCon.hasApiUrl()) {
+        if (shCon.apiRoute().hasApiUrl()) {
             mApiUrlLabelTextView.setText(getText(R.string.configuration_info_api_url_positive));
-            mApiUrlEditText.setText(shCon.getApiUrl().toString());
+            mApiUrlEditText.setText(shCon.apiRoute().getApiUrl().toString());
         } else {
             mApiUrlLabelTextView.setText(getText(R.string.configuration_info_api_url_negative));
             mApiUrlEditText.setText("");
@@ -266,7 +266,7 @@ public class ConfigurationDialogFragment extends DialogFragment
     private void fetchApiUrl() throws MalformedURLException, SocketTimeoutException {
         URL apiUrl = new URL(mApiUrlEditText.getText().toString());
         if (isHostReachable(apiUrl))
-            ApplicationController.getSharedPrefController().setApiUrl(apiUrl);
+            ApplicationController.getSharedPrefController().apiRoute().setApiUrl(apiUrl);
         else
             throw new SocketTimeoutException();
     }

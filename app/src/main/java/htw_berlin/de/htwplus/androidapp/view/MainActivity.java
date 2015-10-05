@@ -100,7 +100,7 @@ public class MainActivity extends FragmentActivity implements ConfigurationDialo
 
     private String buildWarningText(SharedPreferencesController shCon) {
         String warningMessage = getText(R.string.common_attention) + "\n\n";
-        if (!shCon.hasApiUrl())
+        if (!shCon.apiRoute().hasApiUrl())
             warningMessage += getText(R.string.warning_no_api_url) + "\n";
         if (!shCon.oAuth2().hasAccessToken() || (shCon.oAuth2().hasAccessToken()
                 && shCon.oAuth2().isAccessTokenExpired()))

@@ -48,7 +48,7 @@ public class ApplicationController extends Application {
     }
 
     public boolean isWorkingState() {
-        boolean isWorking = (getSharedPrefController().hasApiUrl() &&
+        boolean isWorking = (getSharedPrefController().apiRoute().hasApiUrl() &&
                              !getSharedPrefController().oAuth2().isAccessTokenExpired());
         return isWorking;
     }
