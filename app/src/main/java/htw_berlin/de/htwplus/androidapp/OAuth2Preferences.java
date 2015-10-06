@@ -159,4 +159,27 @@ public class OAuth2Preferences {
     public String getAuthCallBackURI() {
         return mSharedPreferences.getString("authCallBackURI", null);
     }
+
+    public boolean hasCurrentUserId() {
+        return (mSharedPreferences.getLong("currentUserId", -1) != -1);
+    }
+
+    public void setCurrentUserId(long userId) {
+        if (userId > 0) {
+            mSPEditor.putLong("currentUserId", userId);
+            mSPEditor.commit();
+        } else
+            throw new IllegalArgumentException("Current user id must be a greater than 0.");
+    }
+
+    public long getCurrentUserId() {
+        return mSharedPreferences.getLong("currentUserId", -1);
+    }
+
+    public void removeCurrentUserId() {
+        if (hasAuthorizationToken()) {
+            mSPEditor.remove("currentUserId");
+            mSPEditor.commit();
+        }
+    }
 }

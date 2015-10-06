@@ -149,6 +149,7 @@ public class ConfigurationDialogFragment extends DialogFragment
             String accessToken = jsonResponse.getString("access_token");
             String refreshToken = jsonResponse.getString("refresh_token");
             int expiredSeconds = jsonResponse.getInt("expires_in");
+            long currentUserId = jsonResponse.getLong("user_id");
             if (!accessToken.isEmpty()) {
                 if (!refreshToken.isEmpty())
                     Application.preferences().oAuth2().setRefreshToken(refreshToken);
@@ -157,6 +158,8 @@ public class ConfigurationDialogFragment extends DialogFragment
                     Application.preferences().oAuth2().setExpiredTimeAccessToken
                             (new Date(expiredMilliSec));
                 }
+                if (currentUserId > 0)
+                    Application.preferences().oAuth2().setCurrentUserId(currentUserId);
                 Application.preferences().oAuth2().setAccessToken(accessToken);
             }
     }
@@ -231,6 +234,8 @@ public class ConfigurationDialogFragment extends DialogFragment
             shCon.oAuth2().removeExpiredTimeAccessToken();
         if (shCon.oAuth2().hasAuthorizationToken())
             shCon.oAuth2().removeAuthorizationToken();
+        if (shCon.oAuth2().hasCurrentUserId())
+            shCon.oAuth2().removeCurrentUserId();
         fillStateInformations();
     }
 
