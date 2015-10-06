@@ -13,8 +13,6 @@ import com.android.volley.VolleyError;
 
 import net.hamnaberg.funclite.Optional;
 
-import org.json.JSONException;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,10 +23,13 @@ import htw_berlin.de.htwplus.androidapp.R;
 import htw_berlin.de.htwplus.androidapp.datamodel.Post;
 import htw_berlin.de.htwplus.androidapp.datamodel.User;
 
-public class ShowPostActivity extends Activity implements Response.Listener, Response.ErrorListener {
+public class ShowPostActivity extends Activity implements
+        Response.Listener, Response.ErrorListener {
 
-    public static final String REQUEST_TAG = "ShowPostActivity";
-    private int postId;
+    public static final String VOLLEY_ALL_POSTS_REQUEST_TAG = "VolleyAllPostsShowPost";
+    public static final String VOLLEY_ALL_USERS_REQUEST_TAG = "VolleyAllUsersShowPost";
+    public static final String VOLLEY_NEW_POST_REQUEST_TAG = "VolleyNewPostShowPost";
+    private int mPostId;
     private List<Post> mPostCommentList;
     private List<User> mUserList;
     private PostAdapter mPostAdapter;
@@ -44,16 +45,24 @@ public class ShowPostActivity extends Activity implements Response.Listener, Res
         mCreateNewCommentButton = (Button) findViewById(R.id.createNewCommentButton);
         initializeListViewComponents();
         initiateButtonClickListeners();
-        postId = getIntent().getExtras().getInt("postId");
+        mPostId = getIntent().getExtras().getInt("postId");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         if (Application.isWorkingState()) {
-            Application.getVolleyController().getUsers(this, this, this);
-            Application.getVolleyController().getPosts(this, this, this);
+            Application.network().getUsers(VOLLEY_ALL_USERS_REQUEST_TAG, this, this);
+            Application.network().getPosts(VOLLEY_ALL_POSTS_REQUEST_TAG, this, this);
         }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Application.network().cancelRequest(VOLLEY_ALL_POSTS_REQUEST_TAG);
+        Application.network().cancelRequest(VOLLEY_ALL_USERS_REQUEST_TAG);
+        Application.network().cancelRequest(VOLLEY_NEW_POST_REQUEST_TAG);
     }
 
     @Override
@@ -87,7 +96,6 @@ public class ShowPostActivity extends Activity implements Response.Listener, Res
     }
 
     private void initiateButtonClickListeners() {
-
         mCreateNewCommentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -101,11 +109,11 @@ public class ShowPostActivity extends Activity implements Response.Listener, Res
         if (!commentMessage.isEmpty() && Application.isWorkingState()) {
             mCreateNewCommentEditText.setText("");
             long currentUserId = Application.preferences().oAuth2().getCurrentUserId();
-            Application.getVolleyController().addPost(commentMessage, Optional.some(currentUserId),
-                    Optional.some(currentUserId), Optional.some(new Long(postId)), null,
-                    REQUEST_TAG, this, this);
-            Application.getVolleyController().getUsers(this, this, this);
-            Application.getVolleyController().getPosts(this, this, this);
+            Application.network().addPost(commentMessage, Optional.some(currentUserId),
+                    Optional.some(currentUserId), Optional.some(new Long(mPostId)), null,
+                    VOLLEY_NEW_POST_REQUEST_TAG, this, this);
+            Application.network().getUsers(VOLLEY_ALL_USERS_REQUEST_TAG, this, this);
+            Application.network().getPosts(VOLLEY_ALL_POSTS_REQUEST_TAG, this, this);
         } else if (!Application.isWorkingState()) {
             Toast.makeText(getApplicationContext(),
                     R.string.common_error_no_connection,
@@ -120,16 +128,17 @@ public class ShowPostActivity extends Activity implements Response.Listener, Res
         mCommentListview = (ListView) findViewById(R.id.commentListView);
         mPostCommentList = new ArrayList<Post>();
         mUserList = new ArrayList<User>();
-        mPostAdapter = new PostAdapter(this, R.layout.post_listview_item_row, mPostCommentList, mUserList);
+        mPostAdapter = new PostAdapter(this, R.layout.post_listview_item_row,
+                mPostCommentList, mUserList);
         mCommentListview.setAdapter(mPostAdapter);
     }
 
     private void refreshPostData(List<Post> posts) {
         mPostCommentList.clear();
         for (Post post : posts) {
-            if ((post.isCommentPost()) && (post.getParentId() == postId))
+            if ((post.isCommentPost()) && (post.getParentId() == mPostId))
                 mPostCommentList.add(post);
-            else if (post.getPostId() == postId)
+            else if (post.getPostId() == mPostId)
                 mPostCommentList.add(post);
         }
         Collections.sort(mPostCommentList);

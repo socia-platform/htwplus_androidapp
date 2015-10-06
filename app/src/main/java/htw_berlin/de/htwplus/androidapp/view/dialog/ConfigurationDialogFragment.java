@@ -5,7 +5,9 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,8 +24,10 @@ import com.android.volley.VolleyError;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
+import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -33,11 +37,7 @@ import java.util.Map;
 import htw_berlin.de.htwplus.androidapp.Application;
 import htw_berlin.de.htwplus.androidapp.R;
 import htw_berlin.de.htwplus.androidapp.SharedPreferencesController;
-import htw_berlin.de.htwplus.androidapp.VolleyNetworkController;
 
-/**
- * Created by tino on 22.09.15.
- */
 public class ConfigurationDialogFragment extends DialogFragment
         implements Response.Listener, Response.ErrorListener {
 
@@ -87,24 +87,26 @@ public class ConfigurationDialogFragment extends DialogFragment
     @Override
     public void onStop() {
         super.onStop();
-        VolleyNetworkController.getInstance().cancelRequest(VOLLEY_NEW_ACCESS_TOKEN_REQUEST_TAG);
+        Application.network().cancelRequest(VOLLEY_NEW_ACCESS_TOKEN_REQUEST_TAG);
+        Application.network().cancelRequest(VOLLEY_REFRESH_ACCESS_TOKEN_REQUEST_TAG);
         mListener.onConfigurationDialogDismissed();
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
         mDialogView = inflater.inflate(R.layout.configuration_dialog, container);
         getDialog().setTitle(R.string.configuration_title);
-
         mApiUrlLabelTextView = (TextView) mDialogView.findViewById(R.id.apiUrlLabelTextView);
         mApiUrlEditText = (EditText) mDialogView.findViewById(R.id.apiUrlEditText);
         mFetchApiUrlButton = (Button) mDialogView.findViewById(R.id.fetchApiUrlButton);
-        mAccessTokenInfoTextView = (TextView) mDialogView.findViewById(R.id.accessTokenInfoTextView);
-        mAccessTokenInfoDetailsTextView = (TextView) mDialogView.findViewById(R.id.accessTokenInfoDetailsTextView);
+        mAccessTokenInfoTextView =
+                (TextView) mDialogView.findViewById(R.id.accessTokenInfoTextView);
+        mAccessTokenInfoDetailsTextView =
+                (TextView) mDialogView.findViewById(R.id.accessTokenInfoDetailsTextView);
         mOpenAuthViewButton = (Button) mDialogView.findViewById(R.id.openAuthViewButton);
         mResetAccessTokenButton = (Button) mDialogView.findViewById(R.id.resetAccessTokenButton);
         initiateButtonClickListeners();
-
         return mDialogView;
     }
 
@@ -130,8 +132,7 @@ public class ConfigurationDialogFragment extends DialogFragment
         try {
             boolean isAccessTokenExists =
                     Application.preferences().oAuth2().hasAccessToken();
-            JSONObject jsonResponse = new JSONObject((String) response);
-            onVolleyNewAccessTokenResponse(jsonResponse);
+            onVolleyNewAccessTokenResponse(new JSONObject((String) response));
             fillStateInformations();
             if (isAccessTokenExists)
                 Toast.makeText(getActivity(),
@@ -189,18 +190,13 @@ public class ConfigurationDialogFragment extends DialogFragment
 
     private void onFetchApiUrlButtonClicked() {
         try {
-            fetchApiUrl();
-            fillStateInformations();
-            Toast.makeText(getActivity(),
-                    R.string.api_url_saved,
-                    Toast.LENGTH_LONG).show();
+            URL apiUrl = new URL(mApiUrlEditText.getText().toString());
+            RetrieveHostReachabilityTask reachabilityTask = new RetrieveHostReachabilityTask();
+            reachabilityTask.execute(new URL[]{apiUrl});
+            mFetchApiUrlButton.setEnabled(false);
         } catch (MalformedURLException e) {
             Toast.makeText(getActivity(),
                     R.string.error_api_url_invalid,
-                    Toast.LENGTH_LONG).show();
-        } catch (SocketTimeoutException e) {
-            Toast.makeText(getActivity(),
-                    R.string.error_host_unreachable,
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -208,16 +204,10 @@ public class ConfigurationDialogFragment extends DialogFragment
     private void onOpenAuthViewButtonClicked() {
         SharedPreferencesController shCon = Application.preferences();
         if (shCon.apiRoute().hasApiUrl()) {
-            if (isHostReachable(shCon.apiRoute().getApiUrl())) {
-                if (shCon.oAuth2().hasAccessToken() && shCon.oAuth2().hasRefreshToken())
-                    makeRefreshAccessTokenRequest();
-                else
-                    openAuthentificationDialog();
-            }
+            if (shCon.oAuth2().hasAccessToken() && shCon.oAuth2().hasRefreshToken())
+                makeRefreshAccessTokenRequest();
             else
-                Toast.makeText(getActivity(),
-                        R.string.error_host_unreachable,
-                        Toast.LENGTH_LONG).show();
+                openAuthentificationDialog();
         } else
             Toast.makeText(getActivity(),
                     R.string.warning_no_api_url,
@@ -264,32 +254,11 @@ public class ConfigurationDialogFragment extends DialogFragment
             mResetAccessTokenButton.setEnabled(true);
         } else {
             mAccessTokenInfoTextView.setText(getText(R.string.configuration_info_access_token_negative));
-            mAccessTokenInfoDetailsTextView.setText(getText(R.string.configuration_info_details_access_token));
+            mAccessTokenInfoDetailsTextView.setText(
+                    getText(R.string.configuration_info_details_access_token));
             mOpenAuthViewButton.setText(getText(R.string.configuration_open_auth_dialog_button));
             mResetAccessTokenButton.setEnabled(false);
         }
-    }
-
-    private void fetchApiUrl() throws MalformedURLException, SocketTimeoutException {
-        URL apiUrl = new URL(mApiUrlEditText.getText().toString());
-        if (isHostReachable(apiUrl))
-            Application.preferences().apiRoute().setApiUrl(apiUrl);
-        else
-            throw new SocketTimeoutException();
-    }
-
-    private boolean isHostReachable(URL hostUrl) {
-        boolean isReachable = true;
-        Runtime runtime = Runtime.getRuntime();
-        try {
-            Process proc = runtime.exec("ping -c 1 " + hostUrl.getHost());
-            int mPingResult = proc.waitFor();
-            if (mPingResult != 0)
-                isReachable = false;
-        } catch (Exception ex) {
-            isReachable = false;
-        }
-        return isReachable;
     }
 
     private void openAuthentificationDialog() {
@@ -312,7 +281,8 @@ public class ConfigurationDialogFragment extends DialogFragment
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                String redirectUrl = Application.preferences().oAuth2().getAuthCallBackURI() + "?code=";
+                String redirectUrl =
+                        Application.preferences().oAuth2().getAuthCallBackURI() + "?code=";
                 if (url.contains(redirectUrl) && !authComplete) {
                     Uri uri = Uri.parse(url);
                     String authCode = uri.getQueryParameter("code");
@@ -329,12 +299,51 @@ public class ConfigurationDialogFragment extends DialogFragment
     }
 
     private void makeAccessTokenRequest() {
-        Application.getVolleyController().getAccessToken(
+        Application.network().getAccessToken(
                 VOLLEY_NEW_ACCESS_TOKEN_REQUEST_TAG, this, this);
     }
 
     private void makeRefreshAccessTokenRequest() {
-        Application.getVolleyController().refreshAccessToken(
+        Application.network().refreshAccessToken(
                 VOLLEY_REFRESH_ACCESS_TOKEN_REQUEST_TAG, this, this);
+    }
+
+    public class RetrieveHostReachabilityTask extends AsyncTask<URL, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(URL... urls) {
+            boolean isReachable = false;
+            try {
+                URL url = urls[0];
+                SocketAddress sockaddr = new InetSocketAddress(url.getHost(), url.getPort());
+                Socket sock = new Socket();
+                int timeoutMs = 5000;
+                sock.connect(sockaddr, timeoutMs);
+                isReachable = true;
+            } catch (Exception e) {
+                isReachable = false;
+            }
+            return isReachable;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (result) {
+                try {
+                    Application.preferences().apiRoute().setApiUrl(
+                            new URL(mApiUrlEditText.getText().toString()));
+                    fillStateInformations();
+                    Toast.makeText(getActivity(),
+                            R.string.api_url_saved,
+                            Toast.LENGTH_LONG).show();
+                } catch (MalformedURLException muex) {
+                    Log.d("ConfigurationDialog", "Exception Occured: ", muex);
+                }
+            }
+            else
+                Toast.makeText(getActivity(), R.string.error_host_unreachable,
+                        Toast.LENGTH_LONG).show();
+            mFetchApiUrlButton.setEnabled(true);
+        }
     }
 }

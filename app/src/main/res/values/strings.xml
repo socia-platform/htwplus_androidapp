@@ -1,16 +1,9 @@
 <resources>
     <string name="app_name">HTWPlus Androidapp</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="request">Request</string>
     <string name="title_activity_user_list_view">UserListViewActivity</string>
     <string name="title_activity_show_user">ShowUserActivity</string>
-
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section3">Section 3</string>
-
     <string name="app_not_available">Sorry, there\'s no web browser available</string>
     <string name="title_activity_post_list_view">PostListViewActivity</string>
     <string name="title_activity_show_post">ShowPostActivity</string>
@@ -24,6 +17,8 @@
     <string name="main_groups_button">Gruppen</string>
     <string name="warning_no_access">Keine gültigen Logindaten vorhanden</string>
     <string name="warning_no_api_url">Keine gültigen Verbindungsdaten gefunden</string>
+    <string name="warning_no_oauth2_data">Keine Client-ID oder
+        Authentifizierungs-CallBack-URI oder Client-Secret vorhanden</string>
     <string name="click_info_open_configuration">Konfiguration öffnen</string>
     <string name="configuration_info_access_token_positive">Access-Token:</string>
     <string name="configuration_info_access_token_negative">Kein Access-Token vorhanden!</string>
@@ -37,6 +32,12 @@
     <string name="common_error_no_connection">Nicht mit HTWPlus verbunden</string>
     <string name="common_attention">Achtung</string>
     <string name="configuration_reset_access_token_button">Logindaten löschen</string>
-
-
+    <string name="configuration_title">Konfiguration</string>
+    <string name="configuration_api_url_button">OK</string>
+    <string name="api_url_saved">API-URL gespeichert</string>
+    <string name="error_api_url_invalid">Diese URL ist ungültig</string>
+    <string name="error_host_unreachable">Der Host ist nicht erreichbar</string>
+    <string name="error_unexpected_response">Unerwartete Serverantwort</string>
+    <string name="access_token_expired_in">Ablaufdatum</string>
+    <string name="info_access_token_refreshed">Access Token wurde erneuert</string>
 </resources>

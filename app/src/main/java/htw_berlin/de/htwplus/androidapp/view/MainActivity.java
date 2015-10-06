@@ -22,18 +22,19 @@ import htw_berlin.de.htwplus.androidapp.view.dialog.ConfigurationDialogFragment;
 
 public class MainActivity extends FragmentActivity implements Response.Listener,
         Response.ErrorListener, ConfigurationDialogFragment.ConfigurationDialogListener {
-    public static final String REQUEST_TAG = "MainActivity";
+
+    public static final String VOLLEY_ONE_USER_REQUEST_TAG = "VolleyOneUserMain";
     private Button mConfigButton;
     private Button mPostsButton;
     private Button mContactsButton;
     private TextView mMainTextView;
-    private User currentUser;
+    private User mCurrentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        currentUser = null;
+        mCurrentUser = null;
         mConfigButton = (Button) findViewById(R.id.configurationButton);
         mPostsButton = (Button) findViewById(R.id.postButton);
         mContactsButton = (Button) findViewById(R.id.contactsButton);
@@ -45,6 +46,12 @@ public class MainActivity extends FragmentActivity implements Response.Listener,
     protected void onResume() {
         super.onResume();
         updateState();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Application.network().cancelRequest(VOLLEY_ONE_USER_REQUEST_TAG);
     }
 
     @Override
@@ -72,7 +79,7 @@ public class MainActivity extends FragmentActivity implements Response.Listener,
     @Override
     public void onResponse(Object response) {
         if (((List<User>)response).size() == 1) {
-            currentUser = ((List<User>)response).get(0);
+            mCurrentUser = ((List<User>)response).get(0);
             fillStateInformations();
         }
     }
@@ -119,9 +126,9 @@ public class MainActivity extends FragmentActivity implements Response.Listener,
         if (!Application.getInstance().isWorkingState()) {
             String warningText = buildWarningText(Application.preferences());
             mMainTextView.setText(warningText);
-        } else if (currentUser != null) {
+        } else if (mCurrentUser != null) {
             String welcomeText = getText(R.string.main_welcome).toString();
-            welcomeText += ' ' + currentUser.getFirstName() + ' ' + currentUser.getLastName();
+            welcomeText += ' ' + mCurrentUser.getFirstName() + ' ' + mCurrentUser.getLastName();
             mMainTextView.setText(welcomeText);
         } else
             mMainTextView.setText("");
@@ -130,9 +137,9 @@ public class MainActivity extends FragmentActivity implements Response.Listener,
     private void updateState() {
         fillStateInformations();
         if (Application.getInstance().isWorkingState()) {
-            Application.getVolleyController().getUser(
+            Application.network().getUser(
                     Application.preferences().oAuth2().getCurrentUserId(),
-                    REQUEST_TAG, this, this);
+                    VOLLEY_ONE_USER_REQUEST_TAG, this, this);
         }
     }
 
@@ -148,6 +155,9 @@ public class MainActivity extends FragmentActivity implements Response.Listener,
         if (!shCon.oAuth2().hasAccessToken() || (shCon.oAuth2().hasAccessToken()
                 && shCon.oAuth2().isAccessTokenExpired()))
             warningMessage += getText(R.string.warning_no_access) + "\n\n";
+        if ((shCon.oAuth2().getClientId().isEmpty()) || (shCon.oAuth2().getClientSecret().isEmpty())
+                || (shCon.oAuth2().getAuthCallBackURI().isEmpty()))
+            warningMessage += getText(R.string.warning_no_oauth2_data) + "\n\n";
         return warningMessage;
     }
 }

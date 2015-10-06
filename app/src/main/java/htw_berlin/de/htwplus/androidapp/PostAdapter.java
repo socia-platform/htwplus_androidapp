@@ -13,37 +13,35 @@ import java.util.List;
 import htw_berlin.de.htwplus.androidapp.datamodel.Post;
 import htw_berlin.de.htwplus.androidapp.datamodel.User;
 
-/**
- * Created by tino on 14.07.15.
- */
 public class PostAdapter extends ArrayAdapter<Post> {
 
-    private Context context;
-    private int layoutResourceId;
-    private List<Post> posts;
-    private List<User> users;
+    private Context mContext;
+    private int mLayoutResourceId;
+    private List<Post> mPosts;
+    private List<User> mUsers;
 
-    public PostAdapter(Context context, int layoutResourceId, List<Post> data, List<User> userData) {
+    public PostAdapter(Context context, int layoutResourceId,
+                       List<Post> data, List<User> userData) {
         super(context, layoutResourceId, data);
-        this.layoutResourceId = layoutResourceId;
-        this.context = context;
-        this.posts = data;
-        this.users = userData;
+        this.mLayoutResourceId = layoutResourceId;
+        this.mContext = context;
+        this.mPosts = data;
+        this.mUsers = userData;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
         if (row == null) {
-            LayoutInflater inflater = ((Activity) context).getLayoutInflater();
-            row = inflater.inflate(layoutResourceId, parent, false);
+            LayoutInflater inflater = ((Activity) mContext).getLayoutInflater();
+            row = inflater.inflate(mLayoutResourceId, parent, false);
         }
         TextView userNameTextView = (TextView) row.findViewById(R.id.userNameTextView);
         TextView createDateTimeTextView = (TextView) row.findViewById(R.id.createDateTimeTextView);
         TextView postContentTextView = (TextView) row.findViewById(R.id.postContentTextView);
         TextView labelGroupNameTextView = (TextView) row.findViewById(R.id.labelGroupNameTextView);
         TextView groupNameTextView = (TextView) row.findViewById(R.id.groupNameTextView);
-        Post post = posts.get(position);
+        Post post = mPosts.get(position);
         if (post != null) {
             if (userNameTextView != null) {
                 User user = null;
@@ -73,7 +71,7 @@ public class PostAdapter extends ArrayAdapter<Post> {
 
     private User findUser(long accountId) {
         User user = null;
-        for (User aUser : users)
+        for (User aUser : mUsers)
             if (aUser.getAccountId() == accountId) {
                 user = aUser;
                 break;

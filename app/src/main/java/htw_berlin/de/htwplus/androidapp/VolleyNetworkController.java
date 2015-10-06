@@ -129,10 +129,11 @@ public class VolleyNetworkController {
                         Response.Listener<JSONObject> responseListener,
                         Response.ErrorListener errorListener) {
         try {
-            Collection collectionJson = JsonCollectionHelper.buildPost(
-                    content, accountId, ownerId, parentId, groupId);
             Map<String, String> params = new HashMap<>();
             params.put("access_token", Application.preferences().oAuth2().getAccessToken());
+            String resourceUrl = Application.preferences().apiRoute().user(accountId.get(), params);
+            Collection collectionJson = JsonCollectionHelper.buildPost(
+                    resourceUrl, content, accountId, ownerId, parentId, groupId);
             String url = Application.preferences().apiRoute().posts(params);
             final CollectionJsonRequest collJsonPostRequest =
                     new CollectionJsonRequest(Request.Method.POST, url, Post.class, collectionJson,

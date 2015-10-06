@@ -2,7 +2,6 @@ package htw_berlin.de.htwplus.androidapp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.util.Log;
 
 import java.io.UnsupportedEncodingException;
@@ -11,10 +10,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Map;
 
-/**
- * Created by tino on 05.10.15.
- */
 public class ApiRoutePreferences {
+
     private final static String ONE_USER_RESOURCE = "users/";
     private final static String ALL_USER_RESOURCES = "users";
     private final static String ONE_POST_RESOURCE = "posts/";
@@ -25,12 +22,10 @@ public class ApiRoutePreferences {
     private final static String PROTOCOL_CHARSET = "utf-8";
 
     private static ApiRoutePreferences mInstance;
-    private static Context mContext;
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mSPEditor;
 
     private ApiRoutePreferences(Context context) {
-        mContext = context;
         mSharedPreferences =
                 context.getSharedPreferences("ApiRoutePreferences", Context.MODE_PRIVATE);
         mSPEditor = mSharedPreferences.edit();

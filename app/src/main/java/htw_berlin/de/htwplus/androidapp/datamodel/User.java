@@ -1,54 +1,51 @@
 package htw_berlin.de.htwplus.androidapp.datamodel;
 
-/**
- * Created by tino on 28.06.15.
- */
 public class User {
 
-    private int accountId;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String studycourse;
+    private int mAccountId;
+    private String mFirstName;
+    private String mLastName;
+    private String mEmail;
+    private String mStudycourse;
 
     public User(int accId, String fName, String lName, String mail, String sCourse) {
         boolean inputOk = ((accId > 0 ) && (fName != null) && (lName != null) &&
                           (mail != null) && (sCourse != null));
         if (inputOk)
         {
-            accountId = accId;
-            firstName = fName;
-            lastName = lName;
-            email = mail;
-            studycourse = sCourse;
+            mAccountId = accId;
+            mFirstName = fName;
+            mLastName = lName;
+            mEmail = mail;
+            mStudycourse = sCourse;
         }
         else
             throw new IllegalArgumentException("Invalid arguments for user initialization.");
     }
 
     public int getAccountId() {
-        return accountId;
+        return mAccountId;
     }
 
     public String getFirstName() {
-        return firstName;
+        return mFirstName;
     }
 
     public String getLastName() {
-        return lastName;
+        return mLastName;
     }
 
     public String getEmail() {
-        return email;
+        return mEmail;
     }
 
     public String getStudycourse() {
-        return studycourse;
+        return mStudycourse;
     }
 
     @Override
     public String toString() {
-        return "" + firstName + " " + lastName;
+        return "" + mFirstName + " " + mLastName;
     }
 
 

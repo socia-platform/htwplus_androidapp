@@ -22,20 +22,18 @@ import htw_berlin.de.htwplus.androidapp.datamodel.Post;
 import htw_berlin.de.htwplus.androidapp.datamodel.User;
 import htw_berlin.de.htwplus.androidapp.util.JsonCollectionHelper;
 
-/**
- * Created by tino on 04.10.15.
- */
 public class CollectionJsonRequest<T> extends Request<T> {
+
     /** Charset for request. */
     private static final String PROTOCOL_CHARSET = "utf-8";
     /** Content type for request. */
     private static final String PROTOCOL_CONTENT_TYPE =
             String.format("application/vnd.collection+json; charset=%s", PROTOCOL_CHARSET);
-    private final static CollectionParser collectionParser = new CollectionParser();
-    private final Response.Listener<T> listener;
-    private final Map<String, String> customHeaders;
-    private final Class<T> clazz;
-    private Collection body;
+    private final static CollectionParser mCollectionParser = new CollectionParser();
+    private final Response.Listener<T> mListener;
+    private final Map<String, String> mCustomHeaders;
+    private final Class<T> mClazz;
+    private Collection mBodyContent;
 
     public CollectionJsonRequest(int method, String url, Class<T> clazz,
                                  Map<String, String> customHeaders,
@@ -48,10 +46,10 @@ public class CollectionJsonRequest<T> extends Request<T> {
                         || ((body == null) && (Method.GET == method))));
 
         if (isOk) {
-            this.listener = listener;
-            this.customHeaders = customHeaders;
-            this.clazz = clazz;
-            this.body = body;
+            this.mListener = listener;
+            this.mCustomHeaders = customHeaders;
+            this.mClazz = clazz;
+            this.mBodyContent = body;
         } else
             throw new IllegalArgumentException("Invalid arguments.");
     }
@@ -65,17 +63,17 @@ public class CollectionJsonRequest<T> extends Request<T> {
                         && (((body != null) && (Method.POST == method))
                         || ((body == null) && (Method.GET == method))));
         if (isOk) {
-            this.listener = listener;
-            this.customHeaders = new HashMap<String, String>();
-            this.clazz = clazz;
-            this.body = body;
+            this.mListener = listener;
+            this.mCustomHeaders = new HashMap<String, String>();
+            this.mClazz = clazz;
+            this.mBodyContent = body;
         } else
             throw new IllegalArgumentException("Invalid arguments.");
     }
 
     @Override
     protected void deliverResponse(T response) {
-        listener.onResponse(response);
+        mListener.onResponse(response);
     }
 
     @Override
@@ -88,16 +86,16 @@ public class CollectionJsonRequest<T> extends Request<T> {
                 Collection collectionJson = parseToCollection(rawJsonCollection);
                 if (!JsonCollectionHelper.hasError(collectionJson)) {
                     Object parseResult = null;
-                    if (clazz.equals(User.class))
+                    if (mClazz.equals(User.class))
                         parseResult = parseToAccounts(collectionJson);
-                    else if (clazz.equals(Post.class))
+                    else if (mClazz.equals(Post.class))
                         parseResult = parseToPosts(collectionJson);
                     else {
                         String ms = "Expected return class type is not supported";
                         Response.error(new ParseError(new UnsupportedOperationException(ms)));
                     }
-                    returnResponse =
-                            Response.success(parseResult, HttpHeaderParser.parseCacheHeaders(response));
+                    returnResponse = Response.success(parseResult,
+                            HttpHeaderParser.parseCacheHeaders(response));
                 } else {
                     ApiError apiError = parseToApiError(collectionJson);
                     Throwable customThrow = new Throwable(apiError.getMessage());
@@ -117,9 +115,9 @@ public class CollectionJsonRequest<T> extends Request<T> {
 
     @Override
     public Map getHeaders() throws AuthFailureError {
-        customHeaders.put("Accept", PROTOCOL_CONTENT_TYPE);
-        customHeaders.put("Content-Type", PROTOCOL_CONTENT_TYPE);
-        return customHeaders;
+        mCustomHeaders.put("Accept", PROTOCOL_CONTENT_TYPE);
+        mCustomHeaders.put("Content-Type", PROTOCOL_CONTENT_TYPE);
+        return mCustomHeaders;
     }
 
     @Override
@@ -131,17 +129,17 @@ public class CollectionJsonRequest<T> extends Request<T> {
     public byte[] getBody() {
         byte[] returnBody = null;
         try {
-            if (body != null)
-                returnBody = body.toString().getBytes(PROTOCOL_CHARSET);
+            if (mBodyContent != null)
+                returnBody = mBodyContent.toString().getBytes(PROTOCOL_CHARSET);
         } catch (UnsupportedEncodingException uee) {
             VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s",
-                    body.toString(), PROTOCOL_CHARSET);
+                    mBodyContent.toString(), PROTOCOL_CHARSET);
         }
         return returnBody;
     }
 
     private Collection parseToCollection(String rawJsonCollection) throws IOException {
-        return collectionParser.parse(rawJsonCollection);
+        return mCollectionParser.parse(rawJsonCollection);
     }
 
     private List<User> parseToAccounts(Collection collectionJson) {

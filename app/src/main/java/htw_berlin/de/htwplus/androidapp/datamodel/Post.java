@@ -1,161 +1,93 @@
 package htw_berlin.de.htwplus.androidapp.datamodel;
 
-import net.hamnaberg.json.Item;
-import net.hamnaberg.json.Link;
-import net.hamnaberg.json.Query;
-
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * Created by tim on 01.07.15.
- */
 public class Post implements Comparable<Post> {
 
-    private int postId;
-    private String content;
-    private int accountId;
-    private int ownerId;
-    private int parentId;
-    private int groupId;
-    private List<Link> links;
-    private List<Query> queries;
-    private List<Item> items;
-    private String creationDate;
+    private int mPostId;
+    private String mContent;
+    private int mAccountId;
+    private int mOwnerId;
+    private int mParentId;
+    private int mGroupId;
+    private String mCreationDate;
 
-    public Post(int postId, String content, int accountId, int ownerId, int parentId, int groupId, String creationDate) {
-        this.postId = postId;
-        this.content = content;
-        this.accountId = accountId;
-        this.ownerId = ownerId;
-        this.parentId = parentId;
-        this.groupId = groupId;
-        this.links = new ArrayList<Link>();
-        this.items = new ArrayList<Item>();
-        this.queries = new ArrayList<Query>();
-        this.creationDate = creationDate;
+    public Post(int postId, String content, int accountId, int ownerId,
+                int parentId, int groupId, String creationDate) {
+        this.mPostId = postId;
+        this.mContent = content;
+        this.mAccountId = accountId;
+        this.mOwnerId = ownerId;
+        this.mParentId = parentId;
+        this.mGroupId = groupId;
+        this.mCreationDate = creationDate;
     }
-
-    public Post(int postId, String content, int accountId, int ownerId, int parentId, int groupId, List<Link> links, List<Query> queries, List<Item> items, String creationDate) {
-        this.postId = postId;
-        this.content = content;
-        this.accountId = accountId;
-        this.ownerId = ownerId;
-        this.parentId = parentId;
-        this.groupId = groupId;
-        this.links = links;
-        this.items = items;
-        this.queries = queries;
-        this.creationDate = creationDate;
-    }
-
-    // Setters and Getters
 
     public int getPostId() {
-        return postId;
+        return mPostId;
     }
 
     public String getContent() {
-        return content;
+        return mContent;
     }
 
     public void setContent(String content) {
-        this.content = content;
+        this.mContent = content;
     }
 
     public int getAccountId() {
-        return accountId;
+        return mAccountId;
     }
 
     public void setAccountId(int accountId) {
-        this.accountId = accountId;
+        this.mAccountId = accountId;
     }
 
     public int getOwnerId() {
-        return ownerId;
+        return mOwnerId;
     }
 
     public void setOwnerId(int ownerId) {
-        this.ownerId = ownerId;
+        this.mOwnerId = ownerId;
     }
 
     public int getParentId() {
-        return parentId;
+        return mParentId;
     }
 
     public void setParentId(int parentId) {
-        this.parentId = parentId;
+        this.mParentId = parentId;
     }
 
     public int getGroupId() {
-        return groupId;
+        return mGroupId;
     }
 
     public void setGroupId(int groupId) {
-        this.groupId = groupId;
-    }
-
-    public List<Link> getLinks() {
-        return links;
-    }
-
-    public void setLinks(List<Link> links) {
-        this.links = links;
-    }
-
-    public List<Query> getQueries() {
-        return queries;
-    }
-
-    public void setQueries(List<Query> queries) {
-        this.queries = queries;
-    }
-
-    public List<Item> getItems() {
-        return items;
-    }
-
-    public void setItems(List<Item> items) {
-        this.items = items;
-    }
-
-    @Override
-    public String toString() {
-        return "Post{" +
-                "content='" + content + '\'' +
-                ", accountId=" + accountId +
-                ", ownerId=" + ownerId +
-                ", parentId=" + parentId +
-                ", groupId=" + groupId +
-                ", links=" + links +
-                ", queries=" + queries +
-                ", items=" + items +
-                '}';
+        this.mGroupId = groupId;
     }
 
     public boolean isCommentPost() {
-        return (parentId > -1);
+        return (mParentId > -1);
     }
 
     public boolean isGroupPost() {
-        return ((groupId > -1) && (parentId == -1));
+        return ((mGroupId > -1) && (mParentId == -1));
     }
 
     public boolean isGroupCommentPost() {
-        return ((groupId > -1) && (parentId > -1));
+        return ((mGroupId > -1) && (mParentId > -1));
     }
 
     @Override
     public int compareTo(Post post) {
         int result = 0;
-        if (postId > post.getPostId())
+        if (mPostId > post.getPostId())
             result = 1;
-        else if (postId < post.getPostId())
+        else if (mPostId < post.getPostId())
             result = -1;
         return result;
     }
 
     public String getCreationDate() {
-        return creationDate;
+        return mCreationDate;
     }
 }

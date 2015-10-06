@@ -5,18 +5,15 @@ import android.content.SharedPreferences;
 
 import java.util.Date;
 
-/**
- * Created by tino on 05.10.15.
- */
 public class OAuth2Preferences {
+
     private static OAuth2Preferences mInstance;
-    private static Context context;
     private static SharedPreferences mSharedPreferences;
     private static SharedPreferences.Editor mSPEditor;
 
     private OAuth2Preferences(Context context) {
-        this.context = context;
-        mSharedPreferences = context.getSharedPreferences("OAuth2Preferences", Context.MODE_PRIVATE);
+        mSharedPreferences =
+                context.getSharedPreferences("OAuth2Preferences", Context.MODE_PRIVATE);
         mSPEditor = mSharedPreferences.edit();
         setInitialPreferences();
     }
@@ -36,9 +33,9 @@ public class OAuth2Preferences {
     }
 
     private void setInitialPreferences() {
-        mSPEditor.putString("clientId", "b2f88822-c765-4c40-b8d8-60df634b745d");
-        mSPEditor.putString("clientSecret", "fe538d15-46b1-412b-812d-9838f483aec3");
-        mSPEditor.putString("authCallBackURI", "https://localhost/androidclient");
+        mSPEditor.putString("clientId", "");
+        mSPEditor.putString("clientSecret", "");
+        mSPEditor.putString("authCallBackURI", "");
         mSPEditor.commit();
     }
 
@@ -128,8 +125,8 @@ public class OAuth2Preferences {
             mSPEditor.putLong("expiredTimeAccessToken", (expiredDate.getTime() / 1000l));
             mSPEditor.commit();
         } else
-            throw new IllegalArgumentException("Elapsed Date must be a valid Date and must be " +
-                    "after current date.");
+            throw new IllegalArgumentException("Elapsed Date must be a valid Date and must be "
+                    + "after current date.");
     }
 
     public void removeExpiredTimeAccessToken() {

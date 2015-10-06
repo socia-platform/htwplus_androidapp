@@ -15,8 +15,6 @@ import com.android.volley.VolleyError;
 
 import net.hamnaberg.funclite.Optional;
 
-import org.json.JSONException;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,14 +24,17 @@ import htw_berlin.de.htwplus.androidapp.R;
 import htw_berlin.de.htwplus.androidapp.datamodel.Post;
 import htw_berlin.de.htwplus.androidapp.datamodel.User;
 
-public class PostListViewActivity extends Activity implements Response.Listener, Response.ErrorListener {
+public class PostListViewActivity extends Activity implements
+        Response.Listener, Response.ErrorListener {
 
-    public static final String REQUEST_TAG = "PostListViewActivity";
+    public static final String VOLLEY_ALL_POSTS_REQUEST_TAG = "VolleyAllPostsPostListView";
+    public static final String VOLLEY_ALL_USERS_REQUEST_TAG = "VolleyAllUsersPostListView";
+    public static final String VOLLEY_NEW_POST_REQUEST_TAG = "VolleyNewPostPostListView";
     private ArrayList<Post> mPostlist;
     private ArrayList<Post> mPostCommentlist;
     private ArrayList<User> mUserlist;
     private PostAdapter mPostAdapter;
-    private ListView mlistview;
+    private ListView mListview;
     private EditText mCreateNewPostEditText;
     private Button mCreateNewPostButton;
 
@@ -54,11 +55,19 @@ public class PostListViewActivity extends Activity implements Response.Listener,
     protected void onResume() {
         super.onResume();
         if (Application.isWorkingState()) {
-            Application.getVolleyController().getUsers(this, this, this);
-            Application.getVolleyController().getPosts(this, this, this);
+            Application.network().getUsers(VOLLEY_ALL_POSTS_REQUEST_TAG, this, this);
+            Application.network().getPosts(VOLLEY_ALL_POSTS_REQUEST_TAG, this, this);
         } else
             Toast.makeText(getApplicationContext(), R.string.common_error_no_connection,
                     Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Application.network().cancelRequest(VOLLEY_ALL_POSTS_REQUEST_TAG);
+        Application.network().cancelRequest(VOLLEY_ALL_USERS_REQUEST_TAG);
+        Application.network().cancelRequest(VOLLEY_NEW_POST_REQUEST_TAG);
     }
 
     @Override
@@ -90,7 +99,6 @@ public class PostListViewActivity extends Activity implements Response.Listener,
     }
 
     private void initiateButtonClickListeners() {
-
         mCreateNewPostButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -104,10 +112,11 @@ public class PostListViewActivity extends Activity implements Response.Listener,
         if (!postMessage.isEmpty() && Application.isWorkingState()) {
             mCreateNewPostEditText.setText("");
             long currentUserId = Application.preferences().oAuth2().getCurrentUserId();
-            Application.getVolleyController().addPost(postMessage, Optional.some(currentUserId),
-                    Optional.some(currentUserId), null, null, REQUEST_TAG, this, this);
-            Application.getVolleyController().getUsers(this, this, this);
-            Application.getVolleyController().getPosts(this, this, this);
+            Application.network().addPost(postMessage, Optional.some(currentUserId),
+                    Optional.some(currentUserId), null, null,
+                    VOLLEY_NEW_POST_REQUEST_TAG, this, this);
+            Application.network().getUsers(VOLLEY_ALL_USERS_REQUEST_TAG, this, this);
+            Application.network().getPosts(VOLLEY_ALL_POSTS_REQUEST_TAG, this, this);
         } else if (!Application.isWorkingState()) {
             Toast.makeText(getApplicationContext(),
                     R.string.common_error_no_connection,
@@ -119,10 +128,10 @@ public class PostListViewActivity extends Activity implements Response.Listener,
     }
 
     private void initializeListViewComponents() {
-        mlistview = (ListView) findViewById(R.id.list);
+        mListview = (ListView) findViewById(R.id.list);
         mPostAdapter = new PostAdapter(this, R.layout.post_listview_item_row, mPostlist, mUserlist);
-        mlistview.setAdapter(mPostAdapter);
-        mlistview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mListview.setAdapter(mPostAdapter);
+        mListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(view.getContext(), ShowPostActivity.class);
