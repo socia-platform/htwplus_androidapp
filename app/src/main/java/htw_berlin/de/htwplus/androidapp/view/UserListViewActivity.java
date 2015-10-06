@@ -3,6 +3,7 @@ package htw_berlin.de.htwplus.androidapp.view;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -13,7 +14,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import htw_berlin.de.htwplus.androidapp.Application;
 import htw_berlin.de.htwplus.androidapp.R;
@@ -61,8 +65,10 @@ public class UserListViewActivity extends Activity implements Response.Listener,
 
     @Override
     public void onResponse(Object response) {
-        if (response != null)
-            refreshUserData((List<User>) response);
+        if (response != null) {
+            List<User> filteredUsers = filterToContactsOnly((List<User>) response);
+            refreshUserData(filteredUsers);
+        }
     }
 
     private void initializeListViewComponents() {
@@ -85,5 +91,14 @@ public class UserListViewActivity extends Activity implements Response.Listener,
         for (User user : users)
             mlist.add(user);
         mAdapter.notifyDataSetChanged();
+    }
+
+    private List<User> filterToContactsOnly(List<User> users) {
+        List<User> filteredUsers = new ArrayList<User>();
+        for (User user : users) {
+            if (user.getAccountId() != Application.preferences().oAuth2().getCurrentUserId())
+                filteredUsers.add(user);
+        }
+        return filteredUsers;
     }
 }
