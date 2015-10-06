@@ -90,20 +90,18 @@ public class PostListViewActivity extends Activity implements Response.Listener,
     }
 
     public void onCreateNewPostButtonClick(View v) {
-        try {
-            String postMessage = mCreateNewPostEditText.getText().toString();
-            if (!postMessage.isEmpty()) {
-                mCreateNewPostEditText.setText("");
-                Application.getVolleyController().addPost(postMessage, Optional.some(57l),
-                        Optional.some(57l), null, null, REQUEST_TAG, this, this);
-                Application.getVolleyController().getUsers(this, this, this);
-                Application.getVolleyController().getPosts(this, this, this);
-            } else
-                Toast.makeText(getApplicationContext(), "Bitte Post-Message eingeben!", Toast.LENGTH_LONG).show();
-        } catch (JSONException jex) {
-            Toast.makeText(getApplicationContext(), "JSON parse Exception!\nSiehe konsole!", Toast.LENGTH_LONG).show();
-            jex.printStackTrace();
-        }
+        String postMessage = mCreateNewPostEditText.getText().toString();
+        if (!postMessage.isEmpty()) {
+            mCreateNewPostEditText.setText("");
+            long currentUserId = Application.preferences().oAuth2().getCurrentUserId();
+            Application.getVolleyController().addPost(postMessage, Optional.some(currentUserId),
+                    Optional.some(currentUserId), null, null, REQUEST_TAG, this, this);
+            Application.getVolleyController().getUsers(this, this, this);
+            Application.getVolleyController().getPosts(this, this, this);
+        } else
+            Toast.makeText(getApplicationContext(),
+                    R.string.common_error_no_message_input,
+                    Toast.LENGTH_LONG).show();
     }
 
     private void refreshPostData(List<Post> posts) {

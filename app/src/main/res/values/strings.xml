@@ -33,6 +33,7 @@
     <string name="configuration_open_auth_dialog_button_refresh">Refresh</string>
     <string name="main_configuration_button">Einstellungen</string>
     <string name="main_welcome">Hallo</string>
+    <string name="common_error_no_message_input">Keine Nachricht eingegeben</string>
 
     <string name="common_attention">Achtung</string>
     <string name="configuration_reset_access_token_button">Logindaten löschen</string>

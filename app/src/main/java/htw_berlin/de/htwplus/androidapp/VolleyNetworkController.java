@@ -1,6 +1,7 @@
 package htw_berlin.de.htwplus.androidapp;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -126,17 +127,21 @@ public class VolleyNetworkController {
     public void addPost(String content, Optional<Long> accountId, Optional<Long> ownerId,
                         Optional<Long> parentId, Optional<Long> groupId, Object tag,
                         Response.Listener<JSONObject> responseListener,
-                        Response.ErrorListener errorListener) throws JSONException {
-        Collection collectionJson = JsonCollectionHelper.buildPost(
-                content, accountId, ownerId, parentId, groupId);
-        Map<String, String> params = new HashMap<>();
-        params.put("access_token", Application.preferences().oAuth2().getAccessToken());
-        String url = Application.preferences().apiRoute().posts(params);
-        final CollectionJsonRequest collJsonPostRequest =
-                new CollectionJsonRequest(Request.Method.POST, url, Post.class, collectionJson,
-                        responseListener, errorListener);
-        collJsonPostRequest.setTag(tag);
-        mRequestQueue.add(collJsonPostRequest);
+                        Response.ErrorListener errorListener) {
+        try {
+            Collection collectionJson = JsonCollectionHelper.buildPost(
+                    content, accountId, ownerId, parentId, groupId);
+            Map<String, String> params = new HashMap<>();
+            params.put("access_token", Application.preferences().oAuth2().getAccessToken());
+            String url = Application.preferences().apiRoute().posts(params);
+            final CollectionJsonRequest collJsonPostRequest =
+                    new CollectionJsonRequest(Request.Method.POST, url, Post.class, collectionJson,
+                            responseListener, errorListener);
+            collJsonPostRequest.setTag(tag);
+            mRequestQueue.add(collJsonPostRequest);
+        } catch (JSONException e) {
+            Log.d("VolleyNetworkController", "Exception Occured: ", e);
+        }
     }
 
 }

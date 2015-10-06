@@ -53,26 +53,19 @@ public class ShowPostActivity extends Activity implements Response.Listener, Res
     }
 
     public void onCreateNewCommentButtonClick(View v) {
-        try {
-            String commentMessage = mCreateNewCommentEditText.getText().toString();
-            if (!commentMessage.isEmpty()) {
-                mCreateNewCommentEditText.setText("");
-                Application.getVolleyController().addPost(commentMessage,
-                                                                    Optional.some(57l),
-                                                                    Optional.some(57l),
-                                                                    Optional.some(new Long(postId)),
-                                                                    null,
-                                                                    REQUEST_TAG,
-                                                                    this,
-                                                                    this);
-                Application.getVolleyController().getUsers(this, this, this);
-                Application.getVolleyController().getPosts(this, this, this);
-            } else
-                Toast.makeText(getApplicationContext(), "Bitte Antwort eingeben!", Toast.LENGTH_LONG).show();
-        } catch (JSONException jex) {
-            Toast.makeText(getApplicationContext(), "JSON parse Exception!\nSiehe konsole!", Toast.LENGTH_LONG).show();
-            jex.printStackTrace();
-        }
+        String commentMessage = mCreateNewCommentEditText.getText().toString();
+        if (!commentMessage.isEmpty()) {
+            mCreateNewCommentEditText.setText("");
+            long currentUserId = Application.preferences().oAuth2().getCurrentUserId();
+            Application.getVolleyController().addPost(commentMessage, Optional.some(currentUserId),
+                    Optional.some(currentUserId), Optional.some(new Long(postId)), null,
+                    REQUEST_TAG, this, this);
+            Application.getVolleyController().getUsers(this, this, this);
+            Application.getVolleyController().getPosts(this, this, this);
+        } else
+            Toast.makeText(getApplicationContext(),
+                    R.string.common_error_no_message_input,
+                    Toast.LENGTH_LONG).show();
     }
 
     @Override
