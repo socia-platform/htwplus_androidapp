@@ -43,7 +43,7 @@ public class Application extends android.app.Application {
         return spcInstance;
     }
 
-    public boolean isWorkingState() {
+    public static boolean isWorkingState() {
         boolean isWorking = (preferences().apiRoute().hasApiUrl() &&
                              !preferences().oAuth2().isAccessTokenExpired());
         return isWorking;

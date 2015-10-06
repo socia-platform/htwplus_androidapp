@@ -40,32 +40,20 @@ public class ShowPostActivity extends Activity implements Response.Listener, Res
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_post);
-        mCommentListview = (ListView) findViewById(R.id.commentListView);
         mCreateNewCommentEditText = (EditText) findViewById(R.id.createNewCommentEditText);
         mCreateNewCommentButton = (Button) findViewById(R.id.createNewCommentButton);
-        mPostCommentList = new ArrayList<Post>();
-        mUserList = new ArrayList<User>();
+        initializeListViewComponents();
+        initiateButtonClickListeners();
         postId = getIntent().getExtras().getInt("postId");
-        Application.getVolleyController().getUsers(this, this, this);
-        Application.getVolleyController().getPosts(this, this, this);
-        mPostAdapter = new PostAdapter(this, R.layout.post_listview_item_row, mPostCommentList, mUserList);
-        mCommentListview.setAdapter(mPostAdapter);
     }
 
-    public void onCreateNewCommentButtonClick(View v) {
-        String commentMessage = mCreateNewCommentEditText.getText().toString();
-        if (!commentMessage.isEmpty()) {
-            mCreateNewCommentEditText.setText("");
-            long currentUserId = Application.preferences().oAuth2().getCurrentUserId();
-            Application.getVolleyController().addPost(commentMessage, Optional.some(currentUserId),
-                    Optional.some(currentUserId), Optional.some(new Long(postId)), null,
-                    REQUEST_TAG, this, this);
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (Application.isWorkingState()) {
             Application.getVolleyController().getUsers(this, this, this);
             Application.getVolleyController().getPosts(this, this, this);
-        } else
-            Toast.makeText(getApplicationContext(),
-                    R.string.common_error_no_message_input,
-                    Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
@@ -96,6 +84,44 @@ public class ShowPostActivity extends Activity implements Response.Listener, Res
                     refreshUserData((List<User>) (Object) objects);
             }
         }
+    }
+
+    private void initiateButtonClickListeners() {
+
+        mCreateNewCommentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onCreateNewCommentButtonClick();
+            }
+        });
+    }
+
+    private void onCreateNewCommentButtonClick() {
+        String commentMessage = mCreateNewCommentEditText.getText().toString();
+        if (!commentMessage.isEmpty() && Application.isWorkingState()) {
+            mCreateNewCommentEditText.setText("");
+            long currentUserId = Application.preferences().oAuth2().getCurrentUserId();
+            Application.getVolleyController().addPost(commentMessage, Optional.some(currentUserId),
+                    Optional.some(currentUserId), Optional.some(new Long(postId)), null,
+                    REQUEST_TAG, this, this);
+            Application.getVolleyController().getUsers(this, this, this);
+            Application.getVolleyController().getPosts(this, this, this);
+        } else if (!Application.isWorkingState()) {
+            Toast.makeText(getApplicationContext(),
+                    R.string.common_error_no_connection,
+                    Toast.LENGTH_LONG).show();
+        } else if (commentMessage.isEmpty())
+            Toast.makeText(getApplicationContext(),
+                    R.string.common_error_no_message_input,
+                    Toast.LENGTH_LONG).show();
+    }
+
+    private void initializeListViewComponents() {
+        mCommentListview = (ListView) findViewById(R.id.commentListView);
+        mPostCommentList = new ArrayList<Post>();
+        mUserList = new ArrayList<User>();
+        mPostAdapter = new PostAdapter(this, R.layout.post_listview_item_row, mPostCommentList, mUserList);
+        mCommentListview.setAdapter(mPostAdapter);
     }
 
     private void refreshPostData(List<Post> posts) {

@@ -31,7 +31,16 @@ public class ShowUserActivity extends Activity implements Response.Listener, Res
         ViewClass = (TextView) findViewById(R.id.viewClass);
         accountId = getIntent().getExtras().getInt("accountId");
         account = null;
-        Application.getVolleyController().getUser(accountId, REQUEST_TAG, this, this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (Application.isWorkingState())
+            Application.getVolleyController().getUser(accountId, REQUEST_TAG, this, this);
+        else
+            Toast.makeText(getApplicationContext(), R.string.common_error_no_connection,
+                    Toast.LENGTH_LONG).show();
     }
 
 

@@ -29,19 +29,17 @@ public class UserListViewActivity extends Activity implements Response.Listener,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_list_view);
-        mlist = new ArrayList<User>();
-        Application.getVolleyController().getUsers(this, this, this);
-        listview = (ListView) findViewById(R.id.list);
-        mAdapter = new ArrayAdapter<User>(this, android.R.layout.simple_list_item_1, mlist);
-        listview.setAdapter(mAdapter);
-        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(view.getContext(), ShowUserActivity.class);
-                intent.putExtra("accountId", mlist.get(position).getAccountId());
-                UserListViewActivity.this.startActivity(intent);
-            }
-        });
+        initializeListViewComponents();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (Application.isWorkingState())
+            Application.getVolleyController().getUsers(this, this, this);
+        else
+            Toast.makeText(getApplicationContext(), R.string.common_error_no_connection,
+                    Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -63,7 +61,29 @@ public class UserListViewActivity extends Activity implements Response.Listener,
 
     @Override
     public void onResponse(Object response) {
-        mlist.addAll((List<User>)response);
+        if (response != null)
+            refreshUserData((List<User>) response);
+    }
+
+    private void initializeListViewComponents() {
+        mlist = new ArrayList<User>();
+        listview = (ListView) findViewById(R.id.list);
+        mAdapter = new ArrayAdapter<User>(this, android.R.layout.simple_list_item_1, mlist);
+        listview.setAdapter(mAdapter);
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(view.getContext(), ShowUserActivity.class);
+                intent.putExtra("accountId", mlist.get(position).getAccountId());
+                UserListViewActivity.this.startActivity(intent);
+            }
+        });
+    }
+
+    private void refreshUserData(List<User> users) {
+        mlist.clear();
+        for (User user : users)
+            mlist.add(user);
         mAdapter.notifyDataSetChanged();
     }
 }

@@ -46,19 +46,19 @@ public class PostListViewActivity extends Activity implements Response.Listener,
         mPostlist = new ArrayList<Post>();
         mPostCommentlist = new ArrayList<Post>();
         mUserlist = new ArrayList<User>();
-        Application.getVolleyController().getUsers(this, this, this);
-        Application.getVolleyController().getPosts(this, this, this);
-        mlistview = (ListView) findViewById(R.id.list);
-        mPostAdapter = new PostAdapter(this, R.layout.post_listview_item_row, mPostlist, mUserlist);
-        mlistview.setAdapter(mPostAdapter);
-        mlistview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(view.getContext(), ShowPostActivity.class);
-                intent.putExtra("postId", mPostlist.get(position).getPostId());
-                PostListViewActivity.this.startActivity(intent);
-            }
-        });
+        initializeListViewComponents();
+        initiateButtonClickListeners();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (Application.isWorkingState()) {
+            Application.getVolleyController().getUsers(this, this, this);
+            Application.getVolleyController().getPosts(this, this, this);
+        } else
+            Toast.makeText(getApplicationContext(), R.string.common_error_no_connection,
+                    Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -89,19 +89,47 @@ public class PostListViewActivity extends Activity implements Response.Listener,
         }
     }
 
-    public void onCreateNewPostButtonClick(View v) {
+    private void initiateButtonClickListeners() {
+
+        mCreateNewPostButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onCreateNewPostButtonClick();
+            }
+        });
+    }
+
+    private void onCreateNewPostButtonClick() {
         String postMessage = mCreateNewPostEditText.getText().toString();
-        if (!postMessage.isEmpty()) {
+        if (!postMessage.isEmpty() && Application.isWorkingState()) {
             mCreateNewPostEditText.setText("");
             long currentUserId = Application.preferences().oAuth2().getCurrentUserId();
             Application.getVolleyController().addPost(postMessage, Optional.some(currentUserId),
                     Optional.some(currentUserId), null, null, REQUEST_TAG, this, this);
             Application.getVolleyController().getUsers(this, this, this);
             Application.getVolleyController().getPosts(this, this, this);
-        } else
+        } else if (!Application.isWorkingState()) {
+            Toast.makeText(getApplicationContext(),
+                    R.string.common_error_no_connection,
+                    Toast.LENGTH_LONG).show();
+        } else if (postMessage.isEmpty())
             Toast.makeText(getApplicationContext(),
                     R.string.common_error_no_message_input,
                     Toast.LENGTH_LONG).show();
+    }
+
+    private void initializeListViewComponents() {
+        mlistview = (ListView) findViewById(R.id.list);
+        mPostAdapter = new PostAdapter(this, R.layout.post_listview_item_row, mPostlist, mUserlist);
+        mlistview.setAdapter(mPostAdapter);
+        mlistview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(view.getContext(), ShowPostActivity.class);
+                intent.putExtra("postId", mPostlist.get(position).getPostId());
+                PostListViewActivity.this.startActivity(intent);
+            }
+        });
     }
 
     private void refreshPostData(List<Post> posts) {
