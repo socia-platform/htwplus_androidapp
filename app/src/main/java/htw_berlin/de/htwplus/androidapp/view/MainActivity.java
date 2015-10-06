@@ -7,22 +7,33 @@ import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+
+import java.util.List;
 
 import htw_berlin.de.htwplus.androidapp.Application;
 import htw_berlin.de.htwplus.androidapp.R;
 import htw_berlin.de.htwplus.androidapp.SharedPreferencesController;
+import htw_berlin.de.htwplus.androidapp.datamodel.User;
 import htw_berlin.de.htwplus.androidapp.view.dialog.ConfigurationDialogFragment;
 
-public class MainActivity extends FragmentActivity implements ConfigurationDialogFragment.ConfigurationDialogListener {
+public class MainActivity extends FragmentActivity implements Response.Listener,
+        Response.ErrorListener, ConfigurationDialogFragment.ConfigurationDialogListener {
+    public static final String REQUEST_TAG = "MainActivity";
     private Button mConfigButton;
     private Button mPostsButton;
     private Button mContactsButton;
     private TextView mMainTextView;
+    private User currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        currentUser = null;
         mConfigButton = (Button) findViewById(R.id.configurationButton);
         mPostsButton = (Button) findViewById(R.id.postButton);
         mContactsButton = (Button) findViewById(R.id.contactsButton);
@@ -33,16 +44,37 @@ public class MainActivity extends FragmentActivity implements ConfigurationDialo
     @Override
     protected void onResume() {
         super.onResume();
-        fillStateInformations();
+        updateState();
     }
 
     @Override
     public  void onConfigurationDialogDismissed() {
-        if (!Application.getInstance().isWorkingState()) {
-            String warningText = buildWarningText(Application.preferences());
-            mMainTextView.setText(warningText);
-        } else
-            mMainTextView.setText("");
+        updateState();
+    }
+
+    @Override
+    public void onErrorResponse(VolleyError error) {
+        String errorMessage = getText(R.string.error_unexpected_response).toString();
+        if (error != null) {
+            if ((error.getCause() != null) && (error.getCause().getMessage() != null)) {
+                errorMessage += "\n" + error.getCause().getMessage();
+            } else {
+                if (error.getMessage() != null)
+                    errorMessage += "\n" + error.getMessage();
+                else
+                    errorMessage += "\n" + error.toString();
+            }
+        }
+        error.printStackTrace();
+        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onResponse(Object response) {
+        if (((List<User>)response).size() == 1) {
+            currentUser = ((List<User>)response).get(0);
+            fillStateInformations();
+        }
     }
 
     private void initiateButtonClickListeners() {
@@ -87,8 +119,21 @@ public class MainActivity extends FragmentActivity implements ConfigurationDialo
         if (!Application.getInstance().isWorkingState()) {
             String warningText = buildWarningText(Application.preferences());
             mMainTextView.setText(warningText);
+        } else if (currentUser != null) {
+            String welcomeText = getText(R.string.main_welcome).toString();
+            welcomeText += ' ' + currentUser.getFirstName() + ' ' + currentUser.getLastName();
+            mMainTextView.setText(welcomeText);
         } else
             mMainTextView.setText("");
+    }
+
+    private void updateState() {
+        fillStateInformations();
+        if (Application.getInstance().isWorkingState()) {
+            Application.getVolleyController().getUser(
+                    Application.preferences().oAuth2().getCurrentUserId(),
+                    REQUEST_TAG, this, this);
+        }
     }
 
     private void showConfigurationDialog() {
