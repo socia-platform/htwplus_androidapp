@@ -36,7 +36,7 @@ import java.util.Map;
 
 import htw_berlin.de.htwplus.androidapp.Application;
 import htw_berlin.de.htwplus.androidapp.R;
-import htw_berlin.de.htwplus.androidapp.SharedPreferencesController;
+import htw_berlin.de.htwplus.androidapp.SharedPreferencesProxy;
 
 public class ConfigurationDialogFragment extends DialogFragment
         implements Response.Listener, Response.ErrorListener {
@@ -202,7 +202,7 @@ public class ConfigurationDialogFragment extends DialogFragment
     }
 
     private void onOpenAuthViewButtonClicked() {
-        SharedPreferencesController shCon = Application.preferences();
+        SharedPreferencesProxy shCon = Application.preferences();
         if (shCon.apiRoute().hasApiUrl()) {
             if (shCon.oAuth2().hasAccessToken() && shCon.oAuth2().hasRefreshToken())
                 makeRefreshAccessTokenRequest();
@@ -215,7 +215,7 @@ public class ConfigurationDialogFragment extends DialogFragment
     }
 
     private void onResetAccessTokenButton() {
-        SharedPreferencesController shCon = Application.preferences();
+        SharedPreferencesProxy shCon = Application.preferences();
         if (shCon.oAuth2().hasAccessToken())
             shCon.oAuth2().removeAccessToken();
         if (shCon.oAuth2().hasRefreshToken())
@@ -230,7 +230,7 @@ public class ConfigurationDialogFragment extends DialogFragment
     }
 
     private void fillStateInformations() {
-        SharedPreferencesController shCon = Application.preferences();
+        SharedPreferencesProxy shCon = Application.preferences();
         if (shCon.apiRoute().hasApiUrl()) {
             mApiUrlLabelTextView.setText(getText(R.string.configuration_info_api_url_positive));
             mApiUrlEditText.setText(shCon.apiRoute().getApiUrl().toString());

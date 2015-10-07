@@ -16,7 +16,7 @@ import java.util.List;
 
 import htw_berlin.de.htwplus.androidapp.Application;
 import htw_berlin.de.htwplus.androidapp.R;
-import htw_berlin.de.htwplus.androidapp.SharedPreferencesController;
+import htw_berlin.de.htwplus.androidapp.SharedPreferencesProxy;
 import htw_berlin.de.htwplus.androidapp.datamodel.User;
 import htw_berlin.de.htwplus.androidapp.view.dialog.ConfigurationDialogFragment;
 
@@ -148,7 +148,7 @@ public class MainActivity extends FragmentActivity implements Response.Listener,
         confFragmentDialog.show(getFragmentManager(), "configuration");
     }
 
-    private String buildWarningText(SharedPreferencesController shCon) {
+    private String buildWarningText(SharedPreferencesProxy shCon) {
         String warningMessage = getText(R.string.common_attention) + "\n\n";
         if (!shCon.apiRoute().hasApiUrl())
             warningMessage += getText(R.string.warning_no_api_url) + "\n";

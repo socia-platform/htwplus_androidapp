@@ -4,16 +4,14 @@ public class Application extends android.app.Application {
 
     private static Application mInstance;
     private static VolleyNetworkController mVncInstance;
-    private static SharedPreferencesController mSpcInstance;
+    private static SharedPreferencesProxy mSpcInstance;
 
     @Override
     public void onCreate() {
         super.onCreate();
         mInstance = this;
         mVncInstance = VolleyNetworkController.getInstance(getApplicationContext());
-        mSpcInstance = SharedPreferencesController.getInstance(getApplicationContext(),
-                                                                "AppPreferences",
-                                                                MODE_PRIVATE);
+        mSpcInstance = SharedPreferencesProxy.getInstance(getApplicationContext());
     }
 
     public static synchronized Application getInstance() {
@@ -24,7 +22,7 @@ public class Application extends android.app.Application {
         return mVncInstance;
     }
 
-    public static SharedPreferencesController preferences() {
+    public static SharedPreferencesProxy preferences() {
         return mSpcInstance;
     }
 
