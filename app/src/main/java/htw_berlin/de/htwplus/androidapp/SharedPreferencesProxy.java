@@ -24,7 +24,7 @@ public class SharedPreferencesProxy {
     /**
      * Creates a new preference proxy with the given context.
      *
-     * @param context Context of controller
+     * @param context Context of proxy
      */
     private SharedPreferencesProxy(Context context) {
         mOAuth2Pref = OAuth2Preferences.getInstance(context);
