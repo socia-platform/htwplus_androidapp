@@ -38,26 +38,66 @@ import htw_berlin.de.htwplus.androidapp.Application;
 import htw_berlin.de.htwplus.androidapp.R;
 import htw_berlin.de.htwplus.androidapp.SharedPreferencesProxy;
 
+/**
+ * Represents the configuration dialog view.
+ *
+ * @author Tino Herrmann, Tim Unkrig
+ * @version 1.0
+ */
 public class ConfigurationDialogFragment extends DialogFragment
         implements Response.Listener, Response.ErrorListener {
 
+    /**
+     * Listener Interface of the configuration dialog to allow callbacks outside.
+     */
     public interface ConfigurationDialogListener {
         public void onConfigurationDialogDismissed();
     }
 
+    /** Request tag, which indicates a http post-request to get a initial access token. */
     public static final String VOLLEY_NEW_ACCESS_TOKEN_REQUEST_TAG = "VolleyAccessToken";
+
+    /** Request tag, which indicates a http post-request to get a refreshed access token. */
     public static final String VOLLEY_REFRESH_ACCESS_TOKEN_REQUEST_TAG = "VolleyRefreshAccessToken";
+
+    /** Listener to delivery a callback method. */
     private ConfigurationDialogListener mListener;
+
+    /** View of the dialog. */
     private View mDialogView;
+
+    /** Api url label text view of the view. */
     private TextView mApiUrlLabelTextView;
+
+    /** Api url edit field of the view. */
     private EditText mApiUrlEditText;
+
+    /** Fetch api url button of the view. */
     private Button mFetchApiUrlButton;
+
+    /** Authentication dialog. */
     private Dialog mAuthDialog;
+
+    /** Access token state info text view of the view. */
     private TextView mAccessTokenInfoTextView;
+
+    /** Access token detailed state info text view of the view. */
     private TextView mAccessTokenInfoDetailsTextView;
+
+    /** Open authentication webview button of the view. */
     private Button mOpenAuthViewButton;
+
+    /** Reset login data button of the view. */
     private Button mResetAccessTokenButton;
 
+    /**
+     * Called if the dialog attached on the host activity.
+     *
+     * @param activity Host activity of the dialog.
+     *
+     * @throws ClassCastException Throws if host activity implements no configuration dialog
+     * listener interface.
+     */
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -72,18 +112,27 @@ public class ConfigurationDialogFragment extends DialogFragment
         mAuthDialog.setContentView(R.layout.oauth2_dialog);
     }
 
+    /**
+     * Called if the dialog is starting.
+     */
     @Override
     public void onStart() {
         super.onStart();
         fillStateInformations();
     }
 
+    /**
+     * Called if the dialog is resuming.
+     */
     @Override
     public void onResume() {
         super.onStart();
         fillStateInformations();
     }
 
+    /**
+     * Called if the dialog is stopping.
+     */
     @Override
     public void onStop() {
         super.onStop();
@@ -92,6 +141,15 @@ public class ConfigurationDialogFragment extends DialogFragment
         mListener.onConfigurationDialogDismissed();
     }
 
+    /**
+     * Called if the view for dialog is creating.
+     *
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     *
+     * @return Created view for dialog.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -110,6 +168,11 @@ public class ConfigurationDialogFragment extends DialogFragment
         return mDialogView;
     }
 
+    /**
+     * Called if a http response is received, which is not ok.
+     *
+     * @param error
+     */
     @Override
     public void onErrorResponse(VolleyError error) {
         String errorMessage = getText(R.string.error_unexpected_response).toString();
@@ -127,6 +190,11 @@ public class ConfigurationDialogFragment extends DialogFragment
         Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * Called if a http response is received, which is ok.
+     *
+     * @param response
+     */
     @Override
     public void onResponse(Object response) {
         try {
@@ -146,6 +214,13 @@ public class ConfigurationDialogFragment extends DialogFragment
         }
     }
 
+    /**
+     * Called if the response of a http request contains a new access token.
+     *
+     * @param jsonResponse Body of http response as JSON data
+     *
+     * @throws JSONException Throws if the given json data is invalid.
+     */
     private void onVolleyNewAccessTokenResponse(JSONObject jsonResponse) throws JSONException {
             String accessToken = jsonResponse.getString("access_token");
             String refreshToken = jsonResponse.getString("refresh_token");
@@ -165,6 +240,9 @@ public class ConfigurationDialogFragment extends DialogFragment
             }
     }
 
+    /**
+     * Initiates listeners for all buttons of the view.
+     */
     private void initiateButtonClickListeners() {
         mFetchApiUrlButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -188,6 +266,9 @@ public class ConfigurationDialogFragment extends DialogFragment
         });
     }
 
+    /**
+     * Called if was clicked on the fetch api url button.
+     */
     private void onFetchApiUrlButtonClicked() {
         try {
             URL apiUrl = new URL(mApiUrlEditText.getText().toString());
@@ -201,6 +282,9 @@ public class ConfigurationDialogFragment extends DialogFragment
         }
     }
 
+    /**
+     * Called if was clicked on the open authentication button.
+     */
     private void onOpenAuthViewButtonClicked() {
         SharedPreferencesProxy shCon = Application.preferences();
         if (shCon.apiRoute().hasApiUrl()) {
@@ -214,6 +298,9 @@ public class ConfigurationDialogFragment extends DialogFragment
                     Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * Called if was clicked on the reset login data button.
+     */
     private void onResetAccessTokenButton() {
         SharedPreferencesProxy shCon = Application.preferences();
         if (shCon.oAuth2().hasAccessToken())
@@ -229,6 +316,9 @@ public class ConfigurationDialogFragment extends DialogFragment
         fillStateInformations();
     }
 
+    /**
+     * Fills all ui components of the view with content depending on the current state.
+     */
     private void fillStateInformations() {
         SharedPreferencesProxy shCon = Application.preferences();
         if (shCon.apiRoute().hasApiUrl()) {
@@ -261,6 +351,10 @@ public class ConfigurationDialogFragment extends DialogFragment
         }
     }
 
+    /**
+     * Activates and displays a webview in which must the user log in and allows the app access
+     * to the HTWPlus API.
+     */
     private void openAuthentificationDialog() {
         final WebView webView = (WebView)mAuthDialog.findViewById(R.id.webv);
         webView.getSettings().setJavaScriptEnabled(true);
@@ -298,16 +392,30 @@ public class ConfigurationDialogFragment extends DialogFragment
         mAuthDialog.show();
     }
 
+    /**
+     * Sends a http post-request to get a access token.
+     */
     private void makeAccessTokenRequest() {
         Application.network().getAccessToken(
                 VOLLEY_NEW_ACCESS_TOKEN_REQUEST_TAG, this, this);
     }
 
+    /**
+     * Sends a http post-request to get a refreshed access token.
+     */
     private void makeRefreshAccessTokenRequest() {
         Application.network().refreshAccessToken(
                 VOLLEY_REFRESH_ACCESS_TOKEN_REQUEST_TAG, this, this);
     }
 
+    /**
+     * Represents a asynchronous task in which tries to send a simple get-request to the entered
+     * api url so that checks the reachability.<br /><br />
+     *
+     * Depending on the reachability of url it displays a toast message and fill state
+     * information in the ui components. If the url reachable so the entered api url will be add
+     * in api routes preferences.
+     */
     public class RetrieveHostReachabilityTask extends AsyncTask<URL, Void, Boolean> {
 
         @Override
