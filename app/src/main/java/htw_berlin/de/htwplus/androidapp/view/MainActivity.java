@@ -20,16 +20,38 @@ import htw_berlin.de.htwplus.androidapp.SharedPreferencesProxy;
 import htw_berlin.de.htwplus.androidapp.datamodel.User;
 import htw_berlin.de.htwplus.androidapp.view.dialog.ConfigurationDialogFragment;
 
+/**
+ * Represents the main view.
+ *
+ * @author Tino Herrmann, Tim Unkrig
+ * @version 1.0
+ */
 public class MainActivity extends FragmentActivity implements Response.Listener,
         Response.ErrorListener, ConfigurationDialogFragment.ConfigurationDialogListener {
 
+    /** Request tag, which indicates a http get-request to get a single user resource. */
     public static final String VOLLEY_ONE_USER_REQUEST_TAG = "VolleyOneUserMain";
+
+    /** Configuration button of the view. */
     private Button mConfigButton;
+
+    /** Posting button of the view. */
     private Button mPostsButton;
+
+    /** Contacts button of the view. */
     private Button mContactsButton;
+
+    /** Main text view of the view. */
     private TextView mMainTextView;
+
+    /** Current logged in user. */
     private User mCurrentUser;
 
+    /**
+     * Called if activity is creating.
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,23 +64,37 @@ public class MainActivity extends FragmentActivity implements Response.Listener,
         initiateButtonClickListeners();
     }
 
+    /**
+     * Called if activity resuming.
+     */
     @Override
     protected void onResume() {
         super.onResume();
         updateState();
     }
 
+    /**
+     * Called if activity is stopping.
+     */
     @Override
     public void onStop() {
         super.onStop();
         Application.network().cancelRequest(VOLLEY_ONE_USER_REQUEST_TAG);
     }
 
+    /**
+     * Called if configuration dialog dismissed.
+     */
     @Override
     public  void onConfigurationDialogDismissed() {
         updateState();
     }
 
+    /**
+     * Called if a http response is received, which is not ok.
+     *
+     * @param error
+     */
     @Override
     public void onErrorResponse(VolleyError error) {
         String errorMessage = getText(R.string.error_unexpected_response).toString();
@@ -76,6 +112,11 @@ public class MainActivity extends FragmentActivity implements Response.Listener,
         Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * Called if a http response is received, which is ok.
+     *
+     * @param response
+     */
     @Override
     public void onResponse(Object response) {
         if (((List<User>)response).size() == 1) {
@@ -84,6 +125,9 @@ public class MainActivity extends FragmentActivity implements Response.Listener,
         }
     }
 
+    /**
+     * Initiates listeners for all buttons of the view.
+     */
     private void initiateButtonClickListeners() {
 
         mPostsButton.setOnClickListener(new View.OnClickListener() {
@@ -108,20 +152,32 @@ public class MainActivity extends FragmentActivity implements Response.Listener,
         });
     }
 
+    /**
+     * Called if posting button of the view was clicked.
+     */
     private void onPostsButtonClicked() {
         Intent intent = new Intent(getApplicationContext(), PostListViewActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * Called if contacts button of the view was clicked.
+     */
     private void onContactsButtonClicked() {
         Intent intent = new Intent(getApplicationContext(), UserListViewActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * Called if configuration button of the view was clicked.
+     */
     private void onConfigurationButtonClick() {
         showConfigurationDialog();
     }
 
+    /**
+     * Fills all ui components of the view with content depending on the current state.
+     */
     private void fillStateInformations() {
         if (!Application.getInstance().isWorkingState()) {
             String warningText = buildWarningText(Application.preferences());
@@ -134,6 +190,9 @@ public class MainActivity extends FragmentActivity implements Response.Listener,
             mMainTextView.setText("");
     }
 
+    /**
+     * Updates the state of activity.
+     */
     private void updateState() {
         fillStateInformations();
         if (Application.getInstance().isWorkingState()) {
@@ -143,11 +202,21 @@ public class MainActivity extends FragmentActivity implements Response.Listener,
         }
     }
 
+    /**
+     * Activates and displays the configuration dialog.
+     */
     private void showConfigurationDialog() {
         DialogFragment confFragmentDialog = new ConfigurationDialogFragment();
         confFragmentDialog.show(getFragmentManager(), "configuration");
     }
 
+    /**
+     * Assembles a warning text depending on the app state.
+     *
+     * @param shCon Shared preference proxy for access of app attributes
+     *
+     * @return Warning text depending on the app state.
+     */
     private String buildWarningText(SharedPreferencesProxy shCon) {
         String warningMessage = getText(R.string.common_attention) + "\n\n";
         if (!shCon.apiRoute().hasApiUrl())

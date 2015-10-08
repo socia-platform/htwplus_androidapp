@@ -19,14 +19,32 @@ import htw_berlin.de.htwplus.androidapp.Application;
 import htw_berlin.de.htwplus.androidapp.R;
 import htw_berlin.de.htwplus.androidapp.datamodel.User;
 
+/**
+ * Represents the user page with all contacts of the current logged in user.
+ *
+ * @author Tino Herrmann, Tim Unkrig
+ * @version 1.0
+ */
 public class UserListViewActivity extends Activity implements
         Response.Listener, Response.ErrorListener {
 
+    /** Request tag, which indicates a http get-request to get all user resources. */
     public static final String VOLLEY_ALL_USERS_REQUEST_TAG = "VolleyAllUsersUserListView";
+
+    /** List of users, which is hold by array adapter. */
     private ArrayList<User> mUserList;
+
+    /** Array adapter, which is hold by list view. */
     private ArrayAdapter<User> mUserAdapter;
+
+    /** List view of the view. */
     private ListView mUserListview;
 
+    /**
+     * Called if activity is creating.
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +52,9 @@ public class UserListViewActivity extends Activity implements
         initializeListViewComponents();
     }
 
+    /**
+     * Called if activity resuming.
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -44,12 +65,20 @@ public class UserListViewActivity extends Activity implements
                     Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * Called if activity is stopping.
+     */
     @Override
     public void onStop() {
         super.onStop();
         Application.network().cancelRequest(VOLLEY_ALL_USERS_REQUEST_TAG);
     }
 
+    /**
+     * Called if a http response is received, which is not ok.
+     *
+     * @param error
+     */
     @Override
     public void onErrorResponse(VolleyError error) {
         String errorMessage = getText(R.string.error_unexpected_response).toString();
@@ -67,6 +96,11 @@ public class UserListViewActivity extends Activity implements
         Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * Called if a http response is received, which is ok.
+     *
+     * @param response
+     */
     @Override
     public void onResponse(Object response) {
         if (response != null) {
@@ -75,6 +109,9 @@ public class UserListViewActivity extends Activity implements
         }
     }
 
+    /**
+     * Initializes all list view components.
+     */
     private void initializeListViewComponents() {
         mUserList = new ArrayList<User>();
         mUserListview = (ListView) findViewById(R.id.list);
@@ -90,6 +127,11 @@ public class UserListViewActivity extends Activity implements
         });
     }
 
+    /**
+     * Refreshes the user data of the list view component with the given list of user.
+     *
+     * @param users List of user to be refreshed
+     */
     private void refreshUserData(List<User> users) {
         mUserList.clear();
         for (User user : users)
@@ -97,6 +139,13 @@ public class UserListViewActivity extends Activity implements
         mUserAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Filters the own user object out, which is current logged in.
+     *
+     * @param users List of users
+     *
+     * @return Filtered list of users without the own user object.
+     */
     private List<User> filterToContactsOnly(List<User> users) {
         List<User> filteredUsers = new ArrayList<User>();
         for (User user : users) {

@@ -24,20 +24,50 @@ import htw_berlin.de.htwplus.androidapp.R;
 import htw_berlin.de.htwplus.androidapp.datamodel.Post;
 import htw_berlin.de.htwplus.androidapp.datamodel.User;
 
+/**
+ * Represents the posting view of newsstream postings.
+ *
+ * @author Tino Herrmann, Tim Unkrig
+ * @version 1.0
+ */
 public class PostListViewActivity extends Activity implements
         Response.Listener, Response.ErrorListener {
 
+    /** Request tag, which indicates a http get-request to get all posting resources. */
     public static final String VOLLEY_ALL_POSTS_REQUEST_TAG = "VolleyAllPostsPostListView";
+
+    /** Request tag, which indicates a http get-request to get all user resources. */
     public static final String VOLLEY_ALL_USERS_REQUEST_TAG = "VolleyAllUsersPostListView";
+
+    /** Request tag, which indicates a http post-request add a new posting. */
     public static final String VOLLEY_NEW_POST_REQUEST_TAG = "VolleyNewPostPostListView";
+
+    /** List of postings, which is hold by post adapter. */
     private ArrayList<Post> mPostlist;
+
+    /** List of comment postings, which is hold by post adapter. */
     private ArrayList<Post> mPostCommentlist;
+
+    /** List of users, which is hold by post adapter. */
     private ArrayList<User> mUserlist;
+
+    /** Post adapter, which is hold by list view. */
     private PostAdapter mPostAdapter;
+
+    /** List view of the view. */
     private ListView mListview;
+
+    /** Create new posting edit field of the view. */
     private EditText mCreateNewPostEditText;
+
+    /** Create new posting button of the view. */
     private Button mCreateNewPostButton;
 
+    /**
+     * Called if activity is creating.
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +81,9 @@ public class PostListViewActivity extends Activity implements
         initiateButtonClickListeners();
     }
 
+    /**
+     * Called if activity resuming.
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -62,6 +95,9 @@ public class PostListViewActivity extends Activity implements
                     Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * Called if activity is stopping.
+     */
     @Override
     public void onStop() {
         super.onStop();
@@ -70,6 +106,11 @@ public class PostListViewActivity extends Activity implements
         Application.network().cancelRequest(VOLLEY_NEW_POST_REQUEST_TAG);
     }
 
+    /**
+     * Called if a http response is received, which is not ok.
+     *
+     * @param error
+     */
     @Override
     public void onErrorResponse(VolleyError error) {
         String errorMessage = getText(R.string.error_unexpected_response).toString();
@@ -85,6 +126,11 @@ public class PostListViewActivity extends Activity implements
         Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * Called if a http response is received, which is ok.
+     *
+     * @param response
+     */
     @Override
     public void onResponse(Object response) {
         if (response != null) {
@@ -98,6 +144,9 @@ public class PostListViewActivity extends Activity implements
         }
     }
 
+    /**
+     * Initiates listeners for all buttons of the view.
+     */
     private void initiateButtonClickListeners() {
         mCreateNewPostButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,6 +156,9 @@ public class PostListViewActivity extends Activity implements
         });
     }
 
+    /**
+     * Called if create new posting button of the view was clicked.
+     */
     private void onCreateNewPostButtonClick() {
         String postMessage = mCreateNewPostEditText.getText().toString();
         if (!postMessage.isEmpty() && Application.isWorkingState()) {
@@ -127,6 +179,9 @@ public class PostListViewActivity extends Activity implements
                     Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * Initializes all list view components.
+     */
     private void initializeListViewComponents() {
         mListview = (ListView) findViewById(R.id.list);
         mPostAdapter = new PostAdapter(this, R.layout.post_listview_item_row, mPostlist, mUserlist);
@@ -141,6 +196,11 @@ public class PostListViewActivity extends Activity implements
         });
     }
 
+    /**
+     * Refreshes the posting data of the list view component with the given list of posting.
+     *
+     * @param posts List of posting to be refreshed
+     */
     private void refreshPostData(List<Post> posts) {
         mPostCommentlist.clear();
         mPostlist.clear();
@@ -153,6 +213,11 @@ public class PostListViewActivity extends Activity implements
         mPostAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Refreshes the user data of the list view component with the given list of user.
+     *
+     * @param users List of user to be refreshed
+     */
     private void refreshUserData(List<User> users) {
         mUserlist.clear();
         for (User user : users)
